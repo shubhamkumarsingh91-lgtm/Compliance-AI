@@ -1,0 +1,1 @@
+An AI tool that watches Medicaid/payer regulations and automatically tells a compliance team: “this rule changed, here’s exactly what internal policy/process it affects, and here’s a draft of the update.” Think of it as a compliance analyst that never sleeps and never misses a CMS bulletin.
