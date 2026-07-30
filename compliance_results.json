@@ -1,0 +1,41 @@
+[
+  {
+    "policy_family": "prior_auth_outpatient_pt",
+    "old_version": {
+      "title": "Prior Authorization Policy \u2014 Outpatient Services (Sample, v1)",
+      "effective_date": "2026-01-01"
+    },
+    "new_version": {
+      "title": "Prior Authorization Policy \u2014 Outpatient Services (Sample, v2 - UPDATED)",
+      "effective_date": "2026-07-01"
+    },
+    "changes_summary": "- **Threshold for Prior Authorization:** Increased from 12 visits to 20 visits.\n- **Deadline for Submission:** Reduced from 5 business days to 3 business days.\n- **Visit Count for Submission:** Changed from \"before the 13th visit\" to \"before the 21st visit.\"",
+    "impact_analysis": "The policy changes affect the following procedures:\n\n- **[sop_001] Outpatient PT Intake Procedure**: This procedure involves verifying the visit count against the prior authorization threshold. With the new threshold increased to 20 visits, the front desk staff will need to update their process to reflect this change. They should now flag for prior authorization if a patient has reached or exceeded 20 visits instead of 12.\n\n- **[sop_002] Claims Denial Appeals Process**: The appeals process needs to be updated to reflect the new visit threshold and the reduced submission window. Specifically, any appeals referencing the prior authorization policy must now consider the new threshold of 20 visits and the new deadline of 3 business days instead of the previous 5 business days.\n\n- **[sop_003] Telehealth Billing Checklist**: This procedure does not directly involve the prior authorization thresholds or submission deadlines, so it is not affected by these changes. The",
+    "affected_sop_ids": [
+      "sop_001",
+      "sop_002",
+      "sop_003"
+    ],
+    "drafted_updates": [
+      {
+        "sop_id": "sop_001",
+        "sop_title": "Outpatient PT Intake Procedure",
+        "original_text": "Front desk staff verify visit count against the 12-visit prior authorization threshold before scheduling. If a patient exceeds 12 visits, flag for prior auth.",
+        "draft_text": "**Procedure [sop_001] Outpatient PT Intake Procedure:**\n\nFront desk staff verify visit count against the 20-visit prior authorization threshold before scheduling. If a patient exceeds 20 visits, flag for prior authorization. The prior authorization must be submitted no later than 3 business days prior to the 21st visit.\n\n**Citation Line:** Source Policy: Prior Authorization Policy \u2014 Outpatient Services (Sample, v2 - UPDATED) (effective 2026-07-01)"
+      },
+      {
+        "sop_id": "sop_002",
+        "sop_title": "Claims Denial Appeals Process",
+        "original_text": "Appeals for denied physical therapy claims must reference the prior authorization policy visit threshold and the 5-business-day submission window.",
+        "draft_text": "**Procedure [sop_002] Claims Denial Appeals Process:**\n\nAppeals for denied physical therapy claims must reference the prior authorization policy visit threshold of **20 visits** and the **3-business-day submission window**. Claims must be submitted **before the 21st visit**.\n\n**Citation Line:** Source Policy: Prior Authorization Policy \u2014 Outpatient Services (Sample, v2 - UPDATED) (effective 2026-07-01)"
+      },
+      {
+        "sop_id": "sop_003",
+        "sop_title": "Telehealth Billing Checklist",
+        "original_text": "Confirm modality (audio-only vs video) is documented on every telehealth claim before submission.",
+        "draft_text": "**Procedure [sop_003] Telehealth Billing Checklist:**\n\nConfirm modality (audio-only vs video) is documented on every telehealth claim before submission. Additionally, ensure that prior authorization is obtained if the patient has had more than 20 visits within the specified timeframe. Submit all claims no later than 3 business days after the 21st visit.\n\n**Citation Line:** Source Policy: Prior Authorization Policy \u2014 Outpatient Services (Sample, v2 - UPDATED) (effective 2026-07-01)"
+      }
+    ],
+    "status": "drafts_ready_for_review"
+  }
+]
