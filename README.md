@@ -1,80 +1,51 @@
-# AI-Native Compliance Infrastructure
+# Compliance AI Agent
 
-A RAG-based compliance engine for Medicaid payers and state agencies. It reads policy
-documents, detects changes between versions, maps those changes to affected internal
-procedures, and drafts the updated procedure language - automatically, with citations
-back to the source policy.
+A prototype that helps a compliance analyst identify the impact of a policy update. It compares policy versions, identifies potentially affected internal procedures, drafts proposed updates, and packages the results for human review.
 
-Built as a working prototype entirely on free-tier cloud GPU (Kaggle), using only public
-CMS/Medicaid policy text and synthetic internal procedures - no proprietary or client data.
+**Status:** Kaggle notebook prototype through Phase 4. The web interface and formal evaluation are planned.
 
----
+## What it does
 
-## The problem
+1. **Answers policy questions:** Loads sample policy text or public PDFs, retrieves relevant passages, and generates an answer grounded in those passages.
+2. **Detects policy changes:** Pairs older and newer versions of a policy and summarizes what changed.
+3. **Maps operational impact:** Identifies sample internal standard operating procedures (SOPs) that may be affected.
+4. **Drafts procedure updates:** Generates proposed language for affected SOPs, referencing the newer policy and its effective date.
+5. **Exports reviewable results:** Returns a structured result from `run_full_compliance_check()` and writes `compliance_results.json` for a future UI.
 
-State Medicaid agencies and MCOs currently track regulatory changes manually: someone reads
-CMS/state bulletins, cross-references them against internal policy manuals, and updates SOPs
-by hand. It's slow, inconsistent, and error-prone - and the compliance stakes (audits,
-clawbacks, CMS penalties) are high.
+## Example workflow
 
-## What this does
+**Sample policy change:** Prior authorization for outpatient physical therapy changes from **more than 12 visits** to **more than 20 visits** per calendar year. The advance submission period changes from **5 business days** to **3 business days**.
 
-1. **Ingests** policy documents (public CMS/Medicaid bulletins, PDF or plain text)
-2. **Retrieves** relevant passages for any compliance question (RAG)
-3. **Detects changes** between policy versions - old vs. new, side by side
-4. **Maps impact** - which internal procedures does this change actually affect, and why
-5. **Drafts updates** - rewrites the affected procedure language, with a citation back to
-   the source policy and its effective date
+The prototype compares the two policy versions, summarizes those changes, identifies potentially affected sample SOPs, and drafts proposed procedure text. The output is marked `drafts_ready_for_review`; a compliance analyst must verify it before use.
 
-Every answer is grounded in retrieved source text, not the model's memory - if the answer
-isn't in the provided documents, it says so instead of guessing.
+## How it works
 
-## Demo
+| Component | Implementation |
+|---|---|
+| Document ingestion | Sample text, with an optional public-PDF loader using `pypdf` |
+| Chunking | Word-based chunks with overlap |
+| Retrieval | `all-MiniLM-L6-v2` embeddings and a FAISS index |
+| Generation | `Qwen2.5-7B-Instruct` loaded in 4-bit quantization |
+| Change and impact analysis | Prompts comparing policy versions and sample SOPs |
+| Output | Structured Python dictionaries and `compliance_results.json` |
 
-Open `compliance_demo.html` directly in a browser - no server or install needed. It renders
-the AI's output as a redline diff (old text struck through, new text inserted), the same way
-a compliance analyst would review tracked changes in a real document.
+## Run the prototype
 
-## Stack
+1. Import the notebook into **Kaggle**.
+2. Enable a GPU accelerator in the notebook settings.
+3. Run the cells in order, starting with dependency installation.
+4. Start with the included synthetic sample policies and SOPs. Optionally add public policy PDFs through Kaggle’s **Add Data** panel and update the PDF folder path in the notebook.
+5. Review the generated report and download `compliance_results.json` from `/kaggle/working/`.
 
-| Component | Choice | Why |
-|---|---|---|
-| Generation model | Qwen2.5-7B-Instruct (4-bit quantized) | Strong instruction-following at a size that fits free-tier GPU |
-| Embedding model | sentence-transformers `all-MiniLM-L6-v2` | Fast, lightweight, good retrieval quality |
-| Vector search | FAISS | Simple, fast similarity search |
-| Compute | Kaggle free GPU (T4 x2) | No local hardware, no cost |
+## Data and review boundaries
 
-## Repo contents
+The included policy examples and internal SOPs are **synthetic**. The optional PDF loader is intended for **public** documents. Do not upload employer documents, confidential procedures, or protected health information.
 
-```
-compliance_ai_starter.ipynb   - full pipeline: setup, RAG engine, change detection, drafting
-compliance_results.json       - sample generated output from a real run
-compliance_demo.html          - standalone demo UI (open in any browser)
-AI_Native_Compliance_Infrastructure_Overview.pdf  - project/business overview
-```
+Generated change summaries, impact mappings, and procedure drafts are proposals. A qualified reviewer must check them against the source policy before making an operational or compliance decision.
 
-## Running it yourself
+## Current limitations and next steps
 
-1. Upload `compliance_ai_starter.ipynb` to [Kaggle](https://kaggle.com) → **Create → New
-   Notebook → File → Import Notebook**
-2. **Settings → Accelerator → GPU T4 x2**
-3. Run all cells top to bottom
-4. Swap the sample policy text for real public CMS/Medicaid documents when ready
-
-## Status
-
-Working prototype. Validated end-to-end on sample Medicaid prior-authorization and telehealth
-policy text. Not yet connected to a real client's documents or deployed as a hosted service.
-
-## Roadmap
-
-- [ ] Fix change-attribution parsing (currently string-matches SOP IDs, occasionally
-      misflags an unaffected procedure - see commit notes)
-- [ ] Expand to real public CMS/state Medicaid document sets
-- [ ] Add a persistence layer so results don't need to be regenerated per session
-- [ ] Multi-state policy comparison (state-level Medicaid rule variation)
-
----
-
-*No proprietary, client, or employer data is used anywhere in this repository - only
-publicly available policy text and synthetic examples.*
+- The prototype has not been validated against a labeled evaluation set; no accuracy or time-savings claim is made.
+- Impact identification and draft quality need systematic testing, including missed changes and incorrect SOP mappings.
+- The Phase 5 web interface is planned. The current JSON export provides sample data for building it.
+- Future work includes source-level citations, reviewer approval and edit tracking, and tests using real public policy updates.
