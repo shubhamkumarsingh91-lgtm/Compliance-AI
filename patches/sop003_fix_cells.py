@@ -1,3 +1,6 @@
+# Disclaimer: Independent personal project. Not affiliated with any employer, agency or vendor.
+# Public documents and synthetic data only. No internal, confidential or personal data.
+
 # =====================================================================
 # CELL 1 - paste as a new code cell AFTER your Phase 4 cells, then run
 # Replaces the "string match" logic that wrongly flagged sop_003.

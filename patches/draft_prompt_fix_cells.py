@@ -1,3 +1,6 @@
+# Disclaimer: Independent personal project. Not affiliated with any employer, agency or vendor.
+# Public documents and synthetic data only. No internal, confidential or personal data.
+
 # =====================================================================
 # CELL 1 - paste as a new code cell at the BOTTOM of the notebook, run it
 # Tightens the drafting prompt + adds a "new clause" check for human review.

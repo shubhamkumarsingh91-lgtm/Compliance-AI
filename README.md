@@ -1,11 +1,13 @@
 # AI-Native Compliance Infrastructure
 
+> **Disclaimer:** Independent personal project for self-learning. Not affiliated with any employer, state agency or vendor. Uses only public documents and synthetic data. No internal or confidential data and no personal data (no SSNs, member or patient records, PHI/PII). Views are my own. See DISCLAIMER.md.
+
 A RAG prototype that detects Medicaid policy changes between document versions, finds the
 internal procedures (SOPs) those changes affect, and drafts updated procedure text with
 citations to the source policy.
 
 Built on a free Kaggle GPU using only public CMS-style policy text and synthetic internal
-procedures. No proprietary, client or employer data is used anywhere in this repository.
+procedures.
 
 ## The problem
 
@@ -50,7 +52,7 @@ notebooks/   Kaggle notebooks, in run order (starter, phase 3 diff, phase 4 draf
 patches/     Paste-in cells: structured impact fix, stricter draft prompt + flagger
 demo/        compliance_demo.html (redline view), compliance_dashboard.html - open in a browser
 data/        compliance_results.json - output of a real run
-docs/        Swim-lane diagram, project overview PDF, slide deck PDF, setup guide
+docs/        Swim-lane diagram, project overview PDF, setup guide
 ```
 
 ## Run it
@@ -77,3 +79,7 @@ docs/        Swim-lane diagram, project overview PDF, slide deck PDF, setup guid
 - [ ] Run on real public versioned CMS documents
 - [ ] Customer interviews (agency, vendor, other-state practitioners) - decide build, pivot or stop
 - [ ] Hosted backend so results persist
+
+---
+
+*Independent personal project. No proprietary, client, employer or agency data, and no personal data of any kind, is used anywhere in this repository. See [DISCLAIMER.md](DISCLAIMER.md).*

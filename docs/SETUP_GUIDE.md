@@ -1,5 +1,7 @@
 # Setup Guide — Phase 0 to 2
 
+> Disclaimer: Independent personal project for self-learning. Not affiliated with any employer, agency or vendor. Public documents and synthetic data only. No internal, confidential or personal data. See ../DISCLAIMER.md.
+
 ## 1. Create your accounts (5 minutes)
 - **Kaggle**: kaggle.com → sign up (free, no credit card)
 - **GitHub**: github.com → sign up, create a **private** repo called `compliance-ai` to store your code
