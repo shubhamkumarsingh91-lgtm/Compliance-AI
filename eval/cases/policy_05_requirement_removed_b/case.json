@@ -1,0 +1,10 @@
+{
+  "case_id": "policy_05_requirement_removed_b",
+  "category": "policy",
+  "holdout": true,
+  "modeled_on": "HOLDOUT: a requirement removed; different wording from policy_03.",
+  "policy_family": "sample_refill_policy",
+  "old_effective": "2023-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

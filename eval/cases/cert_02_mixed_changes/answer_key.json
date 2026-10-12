@@ -1,0 +1,33 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "Due date 10th -> 5th",
+      "key_terms": [
+        "10th",
+        "5th"
+      ]
+    },
+    {
+      "id": "k2",
+      "desc": "Risk register added",
+      "key_terms": [
+        "risk register"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_s1"
+  ],
+  "edits": {
+    "sop_s1": {
+      "must_contain": [
+        "5th",
+        "risk register"
+      ],
+      "must_not_contain": [
+        "10th"
+      ]
+    }
+  }
+}

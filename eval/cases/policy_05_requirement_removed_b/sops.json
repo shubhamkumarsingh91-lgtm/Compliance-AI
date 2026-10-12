@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sop_f1",
+    "title": "Refill Processing",
+    "text": "Obtain a physician signature on each refill request and dispense within 3 days of the request."
+  },
+  {
+    "id": "sop_f2",
+    "title": "Daily Close Procedure",
+    "text": "Count controlled substances at close each business day and sign the count sheet."
+  }
+]

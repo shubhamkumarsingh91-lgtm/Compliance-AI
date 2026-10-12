@@ -1,0 +1,23 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "Liability insurance proof added",
+      "key_terms": [
+        "liability insurance"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_v1"
+  ],
+  "edits": {
+    "sop_v1": {
+      "must_contain": [
+        "liability insurance",
+        "5-year"
+      ],
+      "must_not_contain": []
+    }
+  }
+}

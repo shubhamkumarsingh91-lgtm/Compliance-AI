@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sop_s1",
+    "title": "Monthly Status Report",
+    "text": "Submit the monthly project status report by the 10th of each month and archive a copy."
+  },
+  {
+    "id": "sop_s2",
+    "title": "Vendor Invoice Review",
+    "text": "Review vendor invoices within 15 days of receipt and route approvals to finance."
+  }
+]

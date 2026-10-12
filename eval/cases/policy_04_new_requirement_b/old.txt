@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Provider Revalidation Policy (v1)
+
+Providers must complete revalidation every 5 years.

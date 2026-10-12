@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Refill Policy (v1)
+
+Pharmacies must obtain a physician signature on each refill request and dispense within 3 days.

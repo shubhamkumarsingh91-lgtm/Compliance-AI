@@ -1,0 +1,10 @@
+{
+  "case_id": "policy_04_new_requirement_b",
+  "category": "policy",
+  "holdout": true,
+  "modeled_on": "HOLDOUT: written after run 1, before the v2 prompt run. A new obligation added; different wording from policy_02.",
+  "policy_family": "sample_provider_revalidation_policy",
+  "old_effective": "2024-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

@@ -1,0 +1,10 @@
+{
+  "case_id": "cert_02_mixed_changes",
+  "category": "certification",
+  "holdout": true,
+  "modeled_on": "HOLDOUT: a changed date and an added item in the same document.",
+  "policy_family": "sample_status_reporting_guide",
+  "old_effective": "2020-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

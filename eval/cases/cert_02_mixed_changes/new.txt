@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Status Reporting Guide (v2)
+
+The State must submit the monthly project status report by the 5th of each month. The report must include a current risk register.

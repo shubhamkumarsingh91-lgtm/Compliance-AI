@@ -22,7 +22,7 @@ change recall, which SOPs were flagged (precision and recall), whether each edit
 the new value and no longer contains the old one, and whether any unaffected SOP got a draft.
 It also counts sentences the model added that were not in the original (human-review flags).
 
-## The six synthetic cases (plus one real case, below)
+## The synthetic cases (plus one real case, below)
 
 | Case | Category | What it tests |
 |---|---|---|
@@ -94,3 +94,36 @@ Honest limits: the matching settings were tuned on this one real pair, so treat 
 not proof. In 2.0 the "eight business areas" evidence is a figure caption, while 3.0 states it in prose; a looser
 match was needed to connect them, which costs more model calls (about 68). Pairs the filter drops can never be
 reported, so a real change that looks like pure rewording can be missed.
+
+## Results log (real runs on Qwen2.5-7B-Instruct 4-bit, Kaggle T4 x2)
+
+Numbers here come from actual runs, not estimates.
+
+### Run 1 - original prompts, whole-document comparison, 7 cases: 4 passed, 3 failed
+
+| Case | Result | What happened |
+|---|---|---|
+| cert_01_checklist_deadlines | pass | |
+| control_01_wording_only | pass | correctly flagged nothing |
+| mita_01_self_assessment_window | pass | |
+| policy_01_prior_auth_threshold | pass | |
+| policy_02_new_requirement_added | FAIL | change detected, but the SOP was not flagged: no draft |
+| policy_03_requirement_removed | FAIL | SOP drafted, but the removed requirement was still in the draft |
+| real_mita_intro_2_0_to_3_0 | FAIL | out of memory: two documents of about 10,500 words in one prompt tried to allocate 26 GiB |
+
+Averages: change recall 1.0, impact precision 0.83, impact recall 0.83, 7 invented clauses flagged for review.
+
+What this means:
+- The pipeline handles number and date changes on short synthetic text.
+- The two synthetic failures were **prompt-design flaws of mine**, not only model weakness: the impact prompt
+  flagged only SOPs that already mention the changed item, and the draft prompt said "change only numbers" and
+  "add no new sentence", so it could not remove or add a requirement. Fixed in `patches/prompt_fix_v2_cells.py`.
+- Comparing whole long documents in one prompt does not work at all on this hardware (out of memory), which is
+  why section-by-section comparison exists.
+- The section-by-section run (68 chunk pairs on the real case) had not finished when results were shared, so
+  there is no score for it yet.
+
+### Run 2 - planned
+Prompt fix v2 plus three **holdout** cases (`policy_04`, `policy_05`, `cert_02`), written after run 1 and before
+run 2 without looking at model output, so the fix is not only tuned to the cases it was designed from. Results
+will be added here.

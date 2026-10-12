@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Provider Revalidation Policy (v2)
+
+Providers must complete revalidation every 5 years. Providers must also submit proof of active liability insurance with each revalidation.

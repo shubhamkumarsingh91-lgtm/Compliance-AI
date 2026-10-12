@@ -85,6 +85,10 @@ def run_eval(pipeline, cases_dir=CASES_DIR, out_path=None):
             row["draft_texts"] = {x["sop_id"]: x["draft_text"] for x in result.get("drafted_updates", [])}
             row["changes_summary"] = result.get("changes_summary", "")
         except Exception as e:  # a crash is a failed case, not a stopped run
+            try:  # free GPU memory so one out-of-memory case does not break the next
+                import gc, torch; gc.collect(); torch.cuda.empty_cache()
+            except Exception:
+                pass
             row = dict(case_id=case["meta"]["case_id"], category=case["meta"]["category"], passed=False, error=repr(e))
         rows.append(row)
     n = len(rows); ok = [r for r in rows if "error" not in r]

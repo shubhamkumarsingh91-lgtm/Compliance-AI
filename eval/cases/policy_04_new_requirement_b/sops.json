@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sop_v1",
+    "title": "Provider Revalidation Checklist",
+    "text": "Send the revalidation packet to each provider 90 days before the 5-year revalidation date and track receipt."
+  },
+  {
+    "id": "sop_v2",
+    "title": "Claims Appeals Intake",
+    "text": "Log each appeal filed within 60 days of the denial notice and assign it to a reviewer."
+  }
+]

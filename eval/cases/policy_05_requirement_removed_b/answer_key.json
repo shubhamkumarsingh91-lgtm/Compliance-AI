@@ -1,0 +1,24 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "Physician signature requirement removed",
+      "key_terms": [
+        "physician signature"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_f1"
+  ],
+  "edits": {
+    "sop_f1": {
+      "must_contain": [
+        "3 days"
+      ],
+      "must_not_contain": [
+        "obtain a physician signature"
+      ]
+    }
+  }
+}
