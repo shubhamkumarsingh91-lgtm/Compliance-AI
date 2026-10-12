@@ -1,0 +1,37 @@
+{
+  "STATUS": "DRAFT - NOT YET VERIFIED. The 3.0 values below came from a quick automated summary of the 3.0 document, not from reading it. Open the 3.0 PDF (Front Matter FM 6, Feb 2012), confirm each number, then delete this STATUS line. Write the key BEFORE running the AI.",
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "Business areas 8 (2.0 slides) -> 10 (3.0)",
+      "key_terms": [
+        "8",
+        "10"
+      ]
+    },
+    {
+      "id": "k2",
+      "desc": "Business processes 78 (2.0 slides) -> 80 (3.0)",
+      "key_terms": [
+        "78",
+        "80"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_i1"
+  ],
+  "edits": {
+    "sop_i1": {
+      "must_contain": [
+        "10",
+        "80"
+      ],
+      "must_not_contain": [
+        "78",
+        "8 MITA"
+      ]
+    }
+  },
+  "notes": "Maturity levels stay 1-5 in both versions, so sop_i2 must NOT be flagged. Format mismatch: 2.0 is slides, 3.0 is prose, so the AI must cope with messy extracted text."
+}

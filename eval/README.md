@@ -63,3 +63,11 @@ and a true old/new pair of the same document still needs to be chosen and verifi
 - Matching is keyword-based, so a correct change described in different words can count as missed.
   Read the failures before trusting the percentages.
 - Synthetic documents are cleaner than real ones. Real-document scores will likely be lower.
+
+## First real case: MITA introduction, 2.0 to 3.0
+
+`real_cases/mita_intro_2_0_to_3_0/` pairs the 2006 "Introduction to the MITA Framework Release 2.0"
+slides (text already extracted) with the 2012 MITA 3.0 introduction (downloaded on Kaggle by
+`real/fetch_real_docs.py`). The 2.0 slides say 8 business areas and 78 business processes; the 3.0
+introduction appears to say 10 and 80, with maturity levels staying 1-5. `answer_key.DRAFT.json` is
+marked **unverified** until you read the 3.0 PDF and confirm the numbers. SOPs are synthetic.

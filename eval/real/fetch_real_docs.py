@@ -18,11 +18,12 @@ def pdf_text(url):
     return "\n".join((p.extract_text() or "") for p in r.pages)
 
 for pair in json.loads((HERE / "real_pairs.json").read_text())["pairs"]:
-    if not pair["old_url"] or not pair["new_url"]:
+    if not (pair.get("old_url") or pair.get("old_path")) or not pair.get("new_url"):
         print("SKIP", pair["name"], "- missing url"); continue
     d = OUT / pair["name"]; d.mkdir(parents=True, exist_ok=True)
     try:
-        (d / "old.txt").write_text(pdf_text(pair["old_url"]))
+        old_text = (HERE.parent / pair["old_path"]).read_text() if pair.get("old_path") else pdf_text(pair["old_url"])
+        (d / "old.txt").write_text(old_text)
         (d / "new.txt").write_text(pdf_text(pair["new_url"]))
         (d / "answer_key.TEMPLATE.json").write_text(json.dumps(
             {"changes": [{"id": "k1", "desc": "WRITE BY HAND before running", "key_terms": []}],

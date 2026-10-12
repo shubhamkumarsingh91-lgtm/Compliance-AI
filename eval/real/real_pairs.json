@@ -2,6 +2,13 @@
   "note": "Candidates only. Related public CMS documents; open each one and confirm it is a genuine old/new pair before trusting any score. Add your own pairs here.",
   "pairs": [
     {
+      "name": "mita_intro_2_0_to_3_0",
+      "category": "mita",
+      "status": "REAL PAIR (same title, different versions). Old = 2006 slides already extracted in real_cases/. New = 3.0 Front Matter FM 6, Feb 2012. Slides vs prose, so expect messy text.",
+      "old_path": "real_cases/mita_intro_2_0_to_3_0/old.txt",
+      "new_url": "https://www.hhs.gov/guidance/sites/default/files/hhs-guidance-documents/CMS/fm6-introduction-to-the-mita-framework-3.0.pdf"
+    },
+    {
       "name": "mita_announcements_2011_2012",
       "category": "mita",
       "status": "candidate - these are two related bulletins, not two versions of one document",

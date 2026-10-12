@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sop_i1",
+    "title": "Business Process Inventory (synthetic)",
+    "text": "Maintain an inventory that covers all 8 MITA business areas and 78 business processes, and review it each quarter."
+  },
+  {
+    "id": "sop_i2",
+    "title": "Maturity Scoring Guide (synthetic)",
+    "text": "Rate each business process at a capability maturity level from 1 through 5 and record the evidence."
+  }
+]

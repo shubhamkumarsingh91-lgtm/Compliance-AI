@@ -1,0 +1,217 @@
+SOURCE: "Introduction to the MITA Framework Release 2.0" slides, CMS, May 8 2006 (public). Text extracted from the 9-slide PDF; slides are mostly diagrams.
+Introduction to the MITA
+Framework Release 2.0
+May 8, 2006
+Architectures of the MITA Framework
+Business
+Architecture
+Information
+Architecture
+Technical
+Architecture
+2
+Medicaid Mission and Goals — MITA Principles, Goals, and Objectives
+Concept of
+Operations
+BAs Link to Data
+Groupings
+Logical Groupings of Business
+Processes
+Provides the
+Base
+Maturity
+Model
+TAs Use Data
+Objects
+Logical Groupings of Technical
+Functions
+Business
+Area
+Drives Business Process
+Business
+Process
+Uses Data Objects
+Drives Business
+Capability
+LDM Maps to Maturity
+Levels
+Uses Data Objects
+Application
+Architecture
+Technical
+Capability
+A TS Implements a Specific
+TC Level
+Defines Messages and
+Interfaces
+Uses
+Uses
+Defines Environment…
+Technical
+Function
+A TF May Have 1 – 5 Maturity
+Levels
+Logical
+Data Model
+Data
+Standards
+Business
+Service
+Solution
+Set
+Uses Data Objects
+Uses
+Defines Messages and
+Interfaces
+A BS Implements a Specific
+BC Level
+Uses
+Uses 1: n
+Conceptual
+Data Model
+CDM Shows Data Groupings for
+BAs
+A BP May Have 1 – 5 Maturity
+Levels
+Business
+Capability
+Technical
+Area
+…and
+Orchestrates
+Services
+Technical
+Service
+Uses
+Uses 1: n
+Can Require
+Technology
+Standards
+Solution
+Set
+Describes Physical Implementation
+3
+Concept of
+Operations
+Business
+Area
+MITA
+Maturity
+Model
+Technical
+Area
+Business
+Process
+Conceptual
+Data
+Model
+Technical
+Function
+Business
+Capability
+Logical
+Data
+Model
+Technical
+Capability
+4
+Medicaid and MITA Mission, Goals, Principles
+Concept of
+Operations
+Vision and
+Use Cases
+Business Area
+(8)
+MITA
+Maturity
+Model
+Business
+Process
+Conceptual
+Data Model
+Data Groupings
+(78)
+Levels 1 – 5
+Business
+Capability
+1 to 5 Levels
+Logical
+Data Model
+Data
+Attributes
+5
+Information Arch Supports Business Arch and
+Technical Arch
+Business
+Process
+Enroll Provider
+Conceptual Data
+Model
+Provider
+Demographics;
+Security
+Technical
+Function
+Security
+Business
+Capability
+Level 1 – 5
+Logical Data Model
+Provider Attributes;
+Security Tokens
+Technical
+Capability
+Level 1 – 5
+Business
+Service
+Enroll Provider
+Data Standards
+NPI
+HCPCS
+NCPDP
+Technical Service
+Authenticate User
+6
+Business and Technical Architecture
+Business Area
+Provider
+Management
+Technical Area
+Security
+Business Process
+Enroll
+Provider
+Technical Function
+Authentication
+Business Capability
+Level 3 One- Stop
+Shop
+Technical Capability
+Level 3
+PKI
+7
+Technical Architecture
+Business
+Service
+Enroll
+Provider
+Technical
+Service
+Authenticate
+User
+Solution Set
+Implementation
+Solution Set
+Implementation
+Technology
+Standards
+PKI
+8
+Technical Architecture
+Business
+Service
+Application
+Architecture
+Technical
+Service
+9
