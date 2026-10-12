@@ -40,7 +40,9 @@ CMS updates, but they are not real policy text.
 
 1. Check the scorer itself (no GPU): `python3 test_harness.py`
 2. On Kaggle, run your pipeline cells, then paste `kaggle_run_eval.py` as a new cell.
-   It prints a pass/fail table and saves `eval_results.json`.
+   It runs every case twice (whole-document vs section-by-section comparison), prints pass/fail tables
+   and saves `eval_results_whole.json` and `eval_results_sectioned.json`. The real MITA case makes about
+   70 model calls in section mode, so allow roughly 10-15 minutes.
 3. Put the numbers in the main README. No numbers yet - none have been run on the real model.
 
 `mock_pipelines.py` holds fake pipelines used only to prove the scorer works (an "oracle" that
@@ -79,3 +81,16 @@ matching sections instead of whole documents.
 More real pairs are available in the full MITA 2.0 and 3.0 packages (for example Part I Chapter 3, the maturity
 model, where 3.0 revised the Level 4 and 5 definitions) but they change in wording rather than numbers, so each
 needs a hand-written key before use.
+
+## Section-by-section comparison (`sectioned.py`)
+
+Long documents overwhelm a 7B model when both versions go into one prompt. `sectioned.py` splits both
+versions into ~180-word chunks, pairs each new chunk with its two most similar old chunks (TF-IDF), drops
+identical pairs and wording-only pairs, and asks the model about each remaining pair. `python3 test_sectioned.py`
+checks this without a GPU: on the real MITA documents the pair holding the 8-to-10 change is found, and the
+wording-only control produces no pairs.
+
+Honest limits: the matching settings were tuned on this one real pair, so treat that check as a sanity test and
+not proof. In 2.0 the "eight business areas" evidence is a figure caption, while 3.0 states it in prose; a looser
+match was needed to connect them, which costs more model calls (about 68). Pairs the filter drops can never be
+reported, so a real change that looks like pure rewording can be missed.

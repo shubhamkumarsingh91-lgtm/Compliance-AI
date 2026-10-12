@@ -1,0 +1,110 @@
+"""Section-by-section change detection for long documents. No GPU needed for the splitting/matching.
+
+Why: asking a 7B model to compare two 5,000-word documents in one prompt makes it miss small changes.
+Instead: split both versions into chunks, pair up matching chunks, drop identical pairs, keep pairs where a
+number or an obligation word changed, and ask the model about each small pair separately.
+
+Usage (after your pipeline cells define detect_changes):
+    from sectioned import make_sectioned_detector
+    detect_changes = make_sectioned_detector(detect_changes)   # run_full_compliance_check now uses it
+"""
+import re
+
+NUMBER_WORDS = {"one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","fifteen",
+                "twenty","thirty","forty","sixty","ninety","hundred","first","second","third"}
+OBLIGATION = {"must","shall","required","require","requires","within","before","after","no","not","only","may","prohibited"}
+STOP = {"the","a","an","of","to","and","or","in","on","for","is","are","be","by","as","at","with"}
+
+
+def _norm_words(s):
+    return re.findall(r"[a-z0-9]+(?:\.[0-9]+)?", s.lower())
+
+
+def split_chunks(text, max_words=180):
+    """Joins broken lines, splits into sentences, groups sentences into ~max_words chunks."""
+    text = re.sub(r"\n(?!\n)", " ", text)           # single newlines are layout, not structure
+    text = re.sub(r"\s+", " ", text)
+    sents = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"(])", text)
+    chunks, cur, n = [], [], 0
+    for s in sents:
+        w = len(s.split())
+        if cur and n + w > max_words:
+            chunks.append(" ".join(cur)); cur, n = [], 0
+        cur.append(s); n += w
+    if cur: chunks.append(" ".join(cur))
+    return chunks
+
+
+def _jaccard(a, b):
+    a, b = set(_norm_words(a)) - STOP, set(_norm_words(b)) - STOP
+    return len(a & b) / len(a | b) if a | b else 0.0
+
+
+MONTHS = {"january","february","march","april","june","july","august","september","october","november","december"}
+_LABEL = re.compile(r"^(v\d+|19\d\d|20\d\d)$")
+
+
+def _changed_tokens(old, new):
+    """Words that differ between two chunks, ignoring version labels (v1, v2), years and month names."""
+    o, n = set(_norm_words(old)), set(_norm_words(new))
+    return {t for t in (o ^ n) if not _LABEL.match(t) and t not in MONTHS}
+
+
+def _is_focus(old, new):
+    """True if what changed includes a digit, a number word, or an obligation word."""
+    return any(t.isdigit() or any(c.isdigit() for c in t) or t in NUMBER_WORDS or t in OBLIGATION
+               for t in _changed_tokens(old, new))
+
+
+def _similarity_matrix(new_chunks, old_chunks):
+    """Rows = new chunks, columns = old chunks. TF-IDF cosine (word + 2-word phrases); Jaccard if sklearn is missing."""
+    try:
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        v = TfidfVectorizer(sublinear_tf=True, ngram_range=(1, 2), stop_words="english").fit(old_chunks + new_chunks)
+        return (v.transform(new_chunks) @ v.transform(old_chunks).T).toarray()
+    except ImportError:
+        return [[_jaccard(o, n) for o in old_chunks] for n in new_chunks]
+
+
+def candidate_pairs(old_text, new_text, top_k=2, min_sim=0.05, focus=True, max_words=180):
+    """Pairs each new chunk with its top_k most similar old chunks (NOT one-to-one: a figure caption in the old
+    version may correspond to a sentence in the new one). Drops identical pairs and, if focus=True, pairs whose
+    only differences are wording. Chunks with no similar partner become 'added' or 'removed' pairs."""
+    old_c, new_c = split_chunks(old_text, max_words), split_chunks(new_text, max_words)
+    S = _similarity_matrix(new_c, old_c)
+    pairs, seen = [], set()
+    for ni, nc in enumerate(new_c):
+        order = sorted(range(len(old_c)), key=lambda oi: -S[ni][oi])[:top_k]
+        matched = False
+        for oi in order:
+            if S[ni][oi] < min_sim: continue
+            matched = True
+            oc = old_c[oi]
+            if (oi, ni) in seen or _norm_words(oc) == _norm_words(nc): continue
+            if focus and not _is_focus(oc, nc): continue
+            seen.add((oi, ni)); pairs.append((oc, nc))
+        if not matched and _is_focus("", nc):
+            pairs.append(("", nc))                                   # new section
+    for oi, oc in enumerate(old_c):
+        if max(S[ni][oi] for ni in range(len(new_c))) < min_sim and _is_focus(oc, ""):
+            pairs.append((oc, ""))                                   # removed section
+    return pairs
+
+
+NO_CHANGE = re.compile(r"\b(no (substantive|concrete|significant)? ?changes?|nothing (substantive )?changed|no changes)\b", re.I)
+
+
+def make_sectioned_detector(base_detect, focus=True, verbose=True):
+    """Wraps detect_changes(old_doc, new_doc) so it runs per matched chunk and merges the results."""
+    def detect(old_doc, new_doc, **kw):
+        pairs = candidate_pairs(old_doc["text"], new_doc["text"], focus=focus)
+        if verbose: print(f"  sectioned: {len(pairs)} candidate chunk pair(s) to check")
+        findings = []
+        for oc, nc in pairs:
+            o = dict(old_doc, text=oc or "(this section did not exist in the old version)")
+            n = dict(new_doc, text=nc or "(this section was removed in the new version)")
+            out = (base_detect(o, n) or "").strip()
+            if out and not NO_CHANGE.search(out[:120]):
+                findings.append(out)
+        return "\n".join(findings) if findings else "No substantive changes."
+    return detect
