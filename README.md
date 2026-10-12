@@ -48,7 +48,7 @@ Change tested: prior-authorization threshold raised from 15 to 20 visits.
 ## Repo layout
 
 ```
-eval/        Test harness: 6 synthetic old/new policy cases with answer keys, scorer, real-document fetcher
+eval/        Test harness: 6 synthetic + 1 real (MITA 2.0 to 3.0) old/new policy cases with answer keys, scorer, real-document fetcher
 notebooks/   Kaggle notebooks, in run order (starter, phase 3 diff, phase 4 drafting)
 patches/     Paste-in cells: structured impact fix, stricter draft prompt + flagger
 demo/        compliance_demo.html (redline view), compliance_dashboard.html - open in a browser

@@ -22,7 +22,7 @@ change recall, which SOPs were flagged (precision and recall), whether each edit
 the new value and no longer contains the old one, and whether any unaffected SOP got a draft.
 It also counts sentences the model added that were not in the original (human-review flags).
 
-## The six synthetic cases
+## The six synthetic cases (plus one real case, below)
 
 | Case | Category | What it tests |
 |---|---|---|
@@ -66,8 +66,12 @@ and a true old/new pair of the same document still needs to be chosen and verifi
 
 ## First real case: MITA introduction, 2.0 to 3.0
 
-`real_cases/mita_intro_2_0_to_3_0/` pairs the 2006 "Introduction to the MITA Framework Release 2.0"
-slides (text already extracted) with the 2012 MITA 3.0 introduction (downloaded on Kaggle by
-`real/fetch_real_docs.py`). The 2.0 slides say 8 business areas and 78 business processes; the 3.0
-introduction appears to say 10 and 80, with maturity levels staying 1-5. `answer_key.DRAFT.json` is
-marked **unverified** until you read the 3.0 PDF and confirm the numbers. SOPs are synthetic.
+`cases/real_mita_intro_2_0_to_3_0/` pairs the 2006 "Introduction to the MITA Framework Release 2.0" slides
+with the 2012 MITA 3.0 introduction (Front Matter FM 6). Both are public CMS documents, already extracted
+to text, so no download is needed. The 2.0 slides say 8 business areas and 78 business processes; the 3.0
+document says ten business areas and 80 business processes, with five maturity levels in both. The answer
+key is verified against both documents and was written before any AI run. SOPs are synthetic. One SOP
+(maturity scoring) must NOT be flagged because the 1-5 scale did not change.
+
+This is the hard test: the new document is about 5,600 words of prose and the old one is slide text, so
+expect the model to struggle. Report the real score either way.

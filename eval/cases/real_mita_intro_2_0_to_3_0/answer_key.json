@@ -1,5 +1,4 @@
 {
-  "STATUS": "DRAFT - NOT YET VERIFIED. The 3.0 values below came from a quick automated summary of the 3.0 document, not from reading it. Open the 3.0 PDF (Front Matter FM 6, Feb 2012), confirm each number, then delete this STATUS line. Write the key BEFORE running the AI.",
   "changes": [
     {
       "id": "k1",
@@ -33,5 +32,6 @@
       ]
     }
   },
-  "notes": "Maturity levels stay 1-5 in both versions, so sop_i2 must NOT be flagged. Format mismatch: 2.0 is slides, 3.0 is prose, so the AI must cope with messy extracted text."
+  "notes": "Maturity levels stay 1-5 in both versions, so sop_i2 must NOT be flagged. Format mismatch: 2.0 is slides, 3.0 is prose, so the AI must cope with messy extracted text.",
+  "verified": "Old values read from the 2006 slides (business areas 8, processes 78). New values read directly from the 3.0 FM6 text (ten business areas, 80 business processes, five maturity levels). Key written before any AI run."
 }

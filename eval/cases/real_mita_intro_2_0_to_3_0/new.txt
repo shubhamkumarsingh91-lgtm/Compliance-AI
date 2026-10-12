@@ -1,0 +1,699 @@
+SOURCE: "Front Matter FM 6 - Introduction to the MITA Framework" version 3.0, CMS, Feb 2012 (public). Text extracted from the 21-page PDF.
+FRONT MATTER
+FM 6 – INTRODUCTION TO THE MITA FRAMEWORK
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Table of Contents
+FRONT MATTER ............................................................................................................................. 1
+FM 6 – INTRODUCTION TO THE MITA FRAMEWORK .......................................................................... 1
+Introduction .............................................................................................................................. 3
+Purpose ................................................................................................................................. 3
+Scope .................................................................................................................................... 4
+Background ........................................................................................................................... 4
+Funding Requirements ............................................................................................................ 4
+MITA Framework ....................................................................................................................... 7
+MITA Framework Components .................................................................................................... 8
+Part I – Business Architecture .................................................................................................. 8
+Part II – Information Architecture .......................................................................................... 10
+Part III – Technical Architecture ............................................................................................. 13
+State Self-Assessment Companion Guide ............................................................................... 16
+Architectural Components Relationships .................................................................................... 16
+Walkthrough of the BA, IA, and TA Components ..................................................................... 18
+Reading the MITA Framework ................................................................................................... 20
+List of Figures
+Figure 6-1. MITA Framework Development Approach ....................................................................... 8
+Figure 6-2. Medicaid Enterprise Business Process Model ................................................................. 10
+Figure 6-3. Conceptual View of Interoperability in the Medicaid Enterprise ...................................... 14
+Figure 6-4. Architectural Component Relationships......................................................................... 17
+List of Tables
+Table 6-1. Correlation of Seven Standards and Conditions ................................................................. 6
+Front Matter FM 6 – Page 2
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Introduction
+The Medicaid IT Architecture (MITA) is an initiative of the Centers for Medicare & Medicaid
+Services (CMS) that establishes national guidelines for technologies and processes that
+enable improved program administration for the State Medicaid Enterprise. The MITA
+initiative includes an architecture framework, processes, and planning guidelines for enabling
+the State Medicaid Enterprise to meet common objectives within the MITA Framework while
+supporting unique local needs. In the context of MITA Framework, the Medicaid Enterprise
+includes the States, the territories, and the District of Columbia (hereinafter referred to as
+States).
+This introduction covers the following topics:
+ MITA Framework Overview
+ MITA Framework Components
+ Architectural Components Relationships
+ Reading the MITA Framework
+Purpose
+MITA is an Information Technology (IT) initiative intended to stimulate an integrated business
+and IT transformation affecting the Medicaid Enterprise in all States. It improves Medicaid
+Program administration by establishing national guidelines for technologies and processes.
+The MITA initiative includes architecture framework, processes, and planning guidelines that
+allow State Medicaid Enterprise to foster national-level coordination of Medicaid
+transformation while supporting unique local needs.
+ The MITA Framework is a consolidation of principles, business and technical models, as
+well as guidelines that creates a template for States to use in the development of their
+individual enterprise architectures.
+ The MITA architectures provide guidance to State Medicaid Enterprise on how to adopt
+the MITA Framework through shared leadership, collaborating, and reuse of solutions.
+ The MITA planning guidelines help States prepare the MITA State Self-Assessment (SSA) and Roadmap to develop enterprise architectures to align to and advance increasingly
+in MITA maturity for business, architecture, and data. MITA guidelines support state’s
+requests for appropriate Federal Financial Participation (FFP) for their Medicaid
+Management Information Systems (MMIS) as well as the Medicaid IT system(s) projects
+related to eligibility determination and enrollment activities.
+The MITA Initiative and the MITA Framework evolve with the participation and help of
+Medicaid stakeholders and partners. MITA matures with insights from various working groups
+and States who have undertaken the MITA Framework, each providing feedback to enhance
+the Framework, processes, and planning guidelines.
+Front Matter FM 6 – Page 3
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Scope
+The MITA Framework is a consolidation of principles, models, and guidelines that combine to
+form a template for the States to use to develop their own enterprise architecture. MITA
+processes provide guidance for State Medicaid Enterprise to use in adopting the MITA
+Framework through shared leadership, collaboration, and reuse of solutions.
+Background
+The MITA initiative began with the concept of moving the design and development of
+Medicaid information systems away from the siloed, sub-system components that comprise a
+typical MMIS. State Medicaid Enterprises are moving to a Service-Oriented Architecture
+(SOA) framework of designing Medicaid information systems along the core principle that
+business processes inform and drive the implementation of business services. The MITA
+initiative produces an architecture framework–business, information, and technical–along
+with a maturity model for process improvement, that guides the planning of technology and
+infrastructure to meet the changing business needs of the State Medicaid Agency (SMA).
+MITA enables State Medicaid Enterprise to meet common objectives within the MITA
+framework while still supporting local needs unique to that state.
+Since the release of the MITA Framework 2.0 several federal initiatives, coding changes, and
+transaction set mandates have altered the information systems landscape, such as, The
+American Recovery and Reinvestment Act (ARRA) of 2009, Health Information Technology
+for Economic and Clinical Health (HITECH), Accredited Standards Committee (ASC) X12N
+Version 5010 and National Council for Prescription Drug Programs (NCPDP) Version D.0 for
+Health Insurance Portability and Accountability Act of 1996 (HIPAA) transactions,
+International Classification of Diseases (ICD-10), and the Affordable Care Act of 2010.
+Funding Requirements
+The Health and Human Services (HHS) CMS 42 CFR Part 433 Medicaid Enterprise; Federal
+Funding for Medicaid Eligibility Determination and Enrollment Activities modifies Medicaid
+regulations for Mechanized Claims Processing and Information Retrieval Systems effective
+April 19, 2011. The MMIS is a mechanized claims processing and information retrieval
+system used by the States for Title XIX of the Social Security Act (The Act.) Therefore, the
+guidance set forth in CMS 42 CFR Part 433 applies to the MMIS as well as the Medicaid
+eligibility determination and enrollment activities as set forth in the Affordable Care Act of
+2010.
+States must meet the standards and conditions specified in §433.112(b)(10) through
+§433.112(b)(16). The standards and conditions are descriptive in nature. However, CMS
+recognizes that in order for the States to meet these standards and conditions it is necessary
+to provide additional guidance that clearly articulates its criteria for meeting them in terms of
+timeliness, accuracy, efficiency, integrity, and performance measures for mechanized claims
+processing. In response to this need, additional guidance materials include:
+ Enhanced Funding Requirements: Seven Conditions and Standards (a.k.a. Seven
+Standards and Conditions)
+Front Matter FM 6 – Page 4
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+ Guidance for Exchange and Medicaid Information Technology (IT) Systems (a.k.a. IT
+Guidance)
+CMS will continue to refine, update and expand this guidance in the future, based on initial
+and continuing feedback from stakeholders and with experience over time.
+SEVEN STANDARDS AND CONDITIONS
+Under sections 1903(a)(3)(A)(i) and 1903(a)(3)(B) of the Social Security Act, CMS has
+issued new standards and conditions that it expects States to adhere to in order for Medicaid
+technology investments (including eligibility systems, as well as traditional claims processing
+systems) to be eligible for enhanced federal matched funds. The intent is to foster better
+collaboration with States, reduce unnecessary paperwork, and focus attention on the key
+elements of success for modern systems development and deployment.
+The Seven Standards and Conditions consist of the following:
+ Modularity Standard – Uses a modular, flexible approach to systems development,
+including the use of open interfaces and exposed Application Programming Interfaces
+(API); the separation of business rules from core programming; and the availability of
+business rules in both human and machine-readable formats. The States commit to
+formal system development methodology and open, reusable system architecture.
+ MITA Condition –States align to and advance increasingly in MITA maturity for business,
+architecture, and data.
+ Industry Standards Condition – Ensures alignment with, and incorporation of, industry
+standards: the Health Insurance Portability and Accountability Act of 1996 (HIPAA)
+security, privacy and transaction standards; accessibility standards established under
+section 508 of the Rehabilitation Act, or standards that provide greater accessibility for
+individuals with disabilities, and compliance with Federal Civil Rights laws; standards
+adopted by the Secretary under section 1104 of the Affordable Care Act; and standards
+and protocols adopted by the Secretary under section 1561 of the Affordable Care Act.
+ Leverage Condition – State solutions should promote sharing, leverage, and reuse of
+Medicaid technologies and systems within and among States.
+ Business Results Condition – Systems should support accurate and timely processing
+of claims (including claims of eligibility), adjudications, and effective communications with
+providers, beneficiaries, and the public.
+ Reporting Condition – Solutions should produce transaction data, reports, and
+performance information that contributes to program evaluation, continuous improvement
+in business operations, and transparency and accountability.
+ Interoperability Condition – Systems must ensure seamless coordination and
+integration with the Exchanges (whether run by the state or federal government), and
+allow interoperability with Health Information Exchange (HIE), public health agencies,
+human services programs, and community organizations providing outreach and
+enrollment assistance services.
+Front Matter FM 6 – Page 5
+February 2012
+Version 3.0
+FM 6 – Introduction to the MITA Framework
+Front Matter
+IT GUIDANCE
+The purpose of the IT Guidance is to assist States as they design, develop, implement, and
+operate technology and systems projects related to the establishment and operation of
+Health Insurance Exchange (HIX) as well as coverage expansions and improvements under
+Medicaid, Children’s Health Insurance Program (CHIP), and premium tax credits and costsharing reductions under the Affordable Care Act of 2010. CMS published this guidance to
+help States achieve interoperability between IT components in the federal and state entities
+that work together to provide health insurance coverage through the Health Insurance
+Exchange (HIX), Medicaid, or CHIP programs. IT systems should be simple and seamless in
+identifying people who qualify for coverage through the Exchange, tax credits, cost-sharing
+reductions, Medicaid, and CHIP. In all cases where overlapping functionality is shared or
+able to be leveraged between Exchanges, Medicaid, and CHIP, these guidance documents
+will align to MITA.
+The MITA Framework describes a structure for the Medicaid Enterprise that includes
+business operations, information exchange, and technological services. The Framework
+includes three (3) parts:
+1. Business Architecture (BA)
+2. Information Architecture (IA)
+3. Technical Architecture (TA)
+Each of the architectures aligns with the Seven Standards and Conditions. By utilizing best
+practices, industry standards, and technology advancements, the processes, and planning
+guidelines that build the MITA Framework provide a cohesive method for meeting Medicaid
+objectives.
+Table 6-1 depicts the impact of the Seven Standards and Conditions on the MITA business,
+information, and technical architectures.
+Table 6-1. Correlation of Seven Standards and Conditions
+Correlation of Seven Standards and Conditions with MITA Architectures
+Standards and Conditions
+Business
+Architecture
+Information
+Architecture
+Technical
+Architecture
+Modularity Standard
+X
+X
+X
+MITA Condition
+X
+X
+X
+Industry Standards Condition
+X
+X
+X
+Leverage Condition
+X
+X
+X
+Business Results Condition
+X
+X
+X
+Front Matter FM 6 – Page 6
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Correlation of Seven Standards and Conditions with MITA Architectures
+Standards and Conditions
+Business
+Architecture
+Information
+Architecture
+Technical
+Architecture
+Reporting Condition
+X
+X
+X
+Interoperability Condition
+X
+X
+X
+MITA Framework
+The MITA Framework 3.0 is an enhancement of the MITA Framework 2.0 and 2.01. The
+MITA team analyzed the ARRA, HITECH, HIPAA, and the Affordable Care Act of 2010
+(among other federal regulations) to determine the Framework 2.0 - 2.01 modifications.
+Industry data standards and emerging technologies also define the comprehensive
+guidelines for Medicaid Enterprise development.
+The MITA Framework 3.0 contains new business procedures and business rules to comply
+with federal regulations. The local, regional, and national information exchanges (e.g.,
+Electronic Health Records (EHR) Incentive Program Registration and Attestation (R&A)
+System, Health Information Exchange (HIE), and Health Insurance Exchange (HIX)) describe
+operational relationships within the Medicaid Enterprise. Established Health Care and Health
+Insurance Industry data standards and transactions are foundational to the conceptual and
+logical information models. The Framework contains advancements in technology
+methodologies such as Cloud Computing and SOA.
+The MITA Framework is a business-driven enterprise architecture. Part I, Business
+Architecture, provides business models that describe the Medicaid Enterprise providing
+flexibility to accommodate state-specific variations and a quickly changing industry. Part II,
+Information Architecture, defines conceptual and logical data models based on industry data
+and transaction standards for simplification. Part III, Technical Architecture, describes
+interchangeable services; not only within each state but also nationwide.
+It is a MITA principle not to implement technology simply because it is available.
+The MITA Framework development approach depicts how goals and objectives develop
+operation concepts that feed the maturity model and data relationships (See Figure 6-1). The
+BA defines the Medicaid Enterprise As-Is operations and To-Be environment with the
+Business Process Model (BPM), Business Process Template (BPT), and Business Capability
+Matrix (BCM). The business process identifies the data relationships that define the Data
+Management Strategy (DMS), Conceptual Data Model (CDM), Logical Data Model (LDM),
+and industry data standards. The architectural analysis and design defines the strategies for
+technological solutions.
+Front Matter FM 6 – Page 7
+February 2012
+Version 3.0
+FM 6 – Introduction to the MITA Framework
+Front Matter
+Figure 6-1. MITA Framework Development Approach
+MITA Framework Components
+The MITA Framework for the Medicaid Enterprise consists of the following components:
+ Part I – Business Architecture
+ Part II – Information Architecture
+ Part III – Technical Architecture
+ SS-A Companion Guide
+As the MITA initiative matures, the MITA team updates these architectures to include
+relevant information. The Architectural Component Relationships section below summaries
+the relationships among the architectural components.
+Part I – Business Architecture
+The MITA BA describes near-term and long-term common business operations of Medicaid
+Enterprise. The MITA BA allows States to map their current operations and future
+improvements to models of a business vision, to business processes, and to business
+capabilities. States can use the business models in the BA to do the following:
+ Drive the development of a target State Medicaid Enterprise architecture.
+ Develop a MITA Roadmap to transition to higher levels of MITA maturity.
+Front Matter FM 6 – Page 8
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+The MITA BA consists of the following Part I Chapters:
+ Concept of Operations (COO)
+ MITA Maturity Model (MMM)
+ Business Process Model (BPM)
+ Business Capability Matrix (BCM)
+CONCEPT OF OPERATIONS
+The MITA COO is from industry best practices to describe the As-Is operations and To-Be
+environment. This provides a structure for defining a vision and establishing common goals
+for improvement. The COO addresses the following:
+ As-Is operations common to all State Medicaid Enterprises.
+ To-Be environment vision with long-term goal for all States.
+ The evolution of stakeholder roles from the As-Is operations to the To-Be environment.
+ The improvement of the quality and accuracy of information over time.
+ Drivers and enablers that facilitate the transformation.
+ Business improvements for the Medicaid Enterprise.
+MITA MATURITY MODEL
+A maturity model is a tool industry and government organizations use to illustrate how a
+business matures over time. Specifically, the MMM is an adaptation of industry best practices
+to the multistate Medicaid Enterprise. The MMM describes five (5) levels of progressive
+improvements and transformation over time. The MMM provides generic descriptions of the
+five (5) levels of maturity and distinguishes among them using a set of capabilities (e.g.,
+timeliness, accuracy, and efficiency). The MMM serves as a reference model for grounding
+the definitions of business, information, and technical capabilities. The MMM also defines
+capabilities for the Seven Standards and Conditions. The MMM establishes boundaries and
+measures to determine whether a business capability is correctly and sufficiently defined.
+BUSINESS PROCESS MODEL
+The MITA BPM presents a hierarchy of Medicaid business processes organized into
+categories (or tiers) of processes. Tier 1 is the business area grouping, Tier 2 is the business
+category grouping, and Tier 3 is the business process. Each business process includes
+defined triggers and business outcomes. This hierarchy helps to categorize business
+activities and ensure relevant functions of the Medicaid Enterprise are present in the
+Framework.
+The BPM includes ten (10) business areas that contain 80 individual business processes.
+The MITA team defines business areas based on key enterprise operations and standard
+business practices of the State Medicaid Enterprise. Figure 6-2 shows Tier 1 of hierarchy
+with each of the MITA business areas that show the boundaries of the Medicaid Enterprise
+according to the MITA Initiative.
+Front Matter FM 6 – Page 9
+February 2012
+Version 3.0
+FM 6 – Introduction to the MITA Framework
+Front Matter
+Figure 6-2. Medicaid Enterprise Business Process Model
+The MITA Framework begins with the classification of the BPM and business capabilities.
+The BPM defines the business needs that identify business rules and the data requirements
+necessary for the Information and Technical Architectures.
+BUSINESS CAPABILITY MATRIX
+A business capability is the SMA ability to execute a business process at a certain level of
+maturity as defined in the BCM. MITA derives business capabilities by applying the MMM to
+business processes of the BPM. Each business process includes five (5) levels of maturity.
+The business capability also uses the MMM qualities that describe how effectively the
+process executes (e.g., ease of use, timeliness, and accuracy). Where applicable the
+capability description and/or quality definition includes performance standards to determine if
+a business process is performing at a stated level of maturity. CMS intends to provide
+additional guidance concerning performance standards–both functional and non-functional,
+and with respect to Service Level Agreements (SLA) and Key Performance Indicators (KPI).
+Business capabilities illustrate how a business process matures and improves over time.
+Technical capabilities are enablers that support the business process at specific levels of
+maturity or technologies that promote MITA goals and objectives (e.g., flexibility,
+adaptability, and interoperability).
+Part II – Information Architecture
+The MITA BA drives the IA. MITA identifies information needs for each business process and
+groups them as subject areas and messages. The SMA constructs To-Be conceptual models
+using the identified subject areas. The LDM development is an ongoing process and adapts
+as business capabilities evolve.
+Front Matter FM 6 – Page 10
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+BPM versus Data Model (DM). The MITA Framework begins with the BPM business
+capabilities and links them to a CDM and then an LDM. States could choose this
+approach or reverse the process for their transformation (i.e., first define the information
+requirements and then choose the business model that supports those requirements).
+The MITA Framework defines business processes first because relatively few State
+Medicaid Enterprises have common data models and data standards available.
+The MITA IA describes the current and future (i.e., As-Is and To-Be) information and data
+needs of the State Medicaid Enterprise. It uses a series of models to specify the key
+elements of information systems that the State Medicaid Enterprise use to execute their
+business processes. These elements include the information itself, the applications that use
+the information to enable the business processes, and the combining of applications and
+information to support the enterprise’s business functions. The BA and the IA together map
+enterprise data to business processes. The IA also serves as the bridge between the BA and
+the TA by providing the framework to go from the BA’s information requirements to the TA’s
+message requirements.
+The MITA IA consists of the following Part II Chapters:
+ Data Management Strategy (DMS)
+ Conceptual Data Model (CDM)
+ Logical Data Model (LDM)
+ Data Standards
+ Information Capability Matrix (ICM)
+DATA MANAGEMENT STRATEGY
+The DMS provides the approach to integrating and organizing data, through reference to
+data governance, data standards, data processes and procedures, data integration, and
+metadata repository.
+CONCEPTUAL DATA MODEL
+The CDM is a blueprint or plan for building information systems. The model is a tool to
+communicate the business processes and enterprise strategies. Specifically, Medicaid
+system architects and designers use the MITA CDM to develop plug-and-play and
+interoperable Medicaid information services. It represents the overall logical structure of the
+data independent of software or data storage structure, provides a formal representation of
+the data the SMA needs to run an enterprise or business activity, and might even include
+data objects not yet developed (i.e., To-Be objects and relationships).
+LOGICAL DATA MODEL
+The LDM shows a data subject area divided into data classes, including the relationships
+among those classes, with attributes defined as needed for one drilled-down business
+process. The LDM identifies all of the data elements in motion in the system or shared within
+Front Matter FM 6 – Page 11
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+the Medicaid Enterprise. The MITA LDM does not include state-specific data objects and
+relationships.
+DATA STANDARDS
+Data Standards consist of a collection of industry standards applicable to the administration
+and operation of a Medicaid Enterprise. They are critical to the successful transformation and
+evolution of the Medicaid Enterprise. The MITA Framework promotes usage of data
+standards produced by national/international standards maintenance organizations. The
+MITA initiative coordinates the identification and use of common data standards for the
+Medicaid Enterprise.
+Each industry standard includes the following attributes:
+ Title
+ Category
+ Objective
+ Source (e.g., standards organizations)
+ Type
+ Versions and status
+ Applicability
+ References
+ Relationships to other standards
+ Key terms
+The MITA team reviews industry standards and relates them to key design aspects and
+concepts within the MITA Framework.
+CMS supports collaboration efforts with industry groups across standards organizations
+where appropriate. CMS continues to support harmonizing data standards across
+disparate groups.
+INFORMATION CAPABILITY MATRIX
+The ICM defines the information capabilities identified in the business process that enables
+technical capabilities. The ICM defines information capabilities for the DMS, CDM, LDM, and
+Data Standards. The ICM describes an IA component at a specific Level 1-5 of MITA Maturity
+for each of the business areas.
+Front Matter FM 6 – Page 12
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Part III – Technical Architecture
+The MITA TA describes the current and future (i.e., As-Is and To-Be) set of business and
+technical services, connectivity, and standards that the SMA uses to plan and specify new IT
+systems for a State Medicaid Enterprise.
+The MITA TA consists of the following Part III Chapters:
+ Technical Management Strategy (TMS)
+ Business Services
+ Technical Services
+ Application Architecture (AA)
+ Technology Standards
+ Technical Capability Matrix (TCM)
+TECHNICAL MANAGEMENT STRATEGY
+The SMA uses the TMS to document the processes, techniques, and technologies the State
+Medicaid Enterprise needs to achieve optimal sharing of Medicaid Enterprise services and
+information. The TMS addresses the common Medicaid services and high-level information
+needs of a Medicaid Enterprise at the logical level.
+The three (3) key challenges facing most State Medicaid Enterprises are:
+1. Highly interconnected systems using point-to-point interfaces require pervasive
+modifications to accommodate changes to business rules, making them difficult to
+modify.
+2. Users navigate through multiple functional systems to perform a single task.
+3. Systems are platform-dependent and do not communicate easily across functional or
+technical boundaries. This causes difficulty in information sharing and reusability.
+Figure 6-3 presents the high-level view of interoperability within the Medicaid Enterprise.
+Front Matter FM 6 – Page 13
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Figure 6-3. Conceptual View of Interoperability in the Medicaid Enterprise
+BUSINESS SERVICES
+A Business Service defines a standard interface and functionality for a business process that
+aligns the common factors of a state’s design with the Medicaid Enterprise definition. The
+MITA Business Service allows the following:
+1. Plug-and-Play – The SMA can replace an individual service with a newer one without
+affecting the rest of the enterprise. For example, a State Medicaid Enterprise replaces a
+service that is currently a wrapped Common Business-Oriented Language (COBOL)
+application with a commercial off-the-shelf product or C++ program without changing any
+of the external interfaces.
+2. Interoperability – A system changes an external user of a service (e.g., delete, add, or
+modify external services or clients) without changing the service itself. For example, a
+new interoperable service is an application or a client added to the State Medicaid
+Enterprise that uses existing application services without structural modifications or
+enhancements (e.g., transformation functions) to those components.
+TECHNICAL SERVICES
+Technical services consist of technical functions that, collectively, define the MITA
+technology infrastructure. Each technical service, as with each business service, defines an
+Front Matter FM 6 – Page 14
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+interface for its invocation, performs a function that corresponds to the capability, and returns
+results. The following are technical service areas:
+ Access and Delivery
+ Intermediary and Interface
+ Integration and Utility
+MITA technical services provide connectivity to the exchanges, incorporate Cloud Computing
+capabilities, and integrate within an Enterprise (intra-agency) Architecture.
+APPLICATION ARCHITECTURE
+The MITA AA provides the information necessary to design enterprise applications using both
+business and technical services. An application, in the context of the TA, is a collection of
+software services that conduct a business process at a specific level of maturity. The AA
+defines the relationship between stakeholders, services, and infrastru cture. It also provides
+guidance to the SMA on how to connect services and infrastructures to improve services for
+stakeholders.
+TECHNOLOGY STANDARDS
+Technology Standards associates the industry standards with target technologies that
+support the goals of the Medicaid Enterprise. The TA selects technologies and standards that
+meet the MITA Framework requirements, identifies the functional components that apply to
+State Medicaid Enterprise, as well as any gaps in the standards, and tailors them as
+necessary into robust solution sets. The MITA team presents technical standards with the
+following:
+ Technical Standards Reference Model (SRM)
+ Technology Standards Reference Guide (TSRG)
+The SRM is a framework to identify technical services. The SRM provides the structure for
+categorizing the technology standards. It provides information about each standard that a
+state can use in its procurement specifications. MITA Framework classifies technology
+standards into three (3) categories:
+ Ready – Technology that is ready to use.
+ Emerging – Technology that fits the needs of MITA over the next year.
+ Incubating – Technology that is on a watch list as being nearly ready.
+The TSRG is a collection of standards applicable to the administration and operation of a
+State Medicaid Enterprise. There are four (4) categories of industry standards:
+ Architecture, Analysis, and Design Standards
+ Service Interoperability
+ Security and Privacy
+ Business Enabling Technologies
+Front Matter FM 6 – Page 15
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+TECHNICAL CAPABILITY MATRIX
+The MITA TCM defines a set of high-level technical components to do the following:
+ Enable the MITA business capabilities at different levels of maturity.
+ Realizing MITA mission, goals, and objectives.
+ Enabling the transition of a legacy system or process to the MITA Framework.
+ Alignment with the Seven Standards and Conditions.
+The TCM provides a baseline for the State Medicaid Enterprise to follow in their alignment
+with MITA principles. The TCM uses the five (5) levels of maturity the MMM defines. The
+TCM associates technical components with each level that are enablers of the corresponding
+business capability. Each technical capability consists of one or more technical services.
+State Self-Assessment Companion Guide
+The purpose of conducting the SS-A is to identify the As-Is operations and To-Be
+environment of Business, Information, and Technical Architectures and the Seven Standards
+and Conditions for the State Medicaid Enterprise. The SS-A Companion Guide is a tool to
+assist the state with conducting the SS-A, preparing the MITA Roadmap, and producing the
+necessary documentation to accompany the Advance Planning Document (APD). This
+Companion Guide provides guidance and templates for completing the SS-A as well as
+collecting supporting evidence references.
+Architectural Components Relationships
+Figure 6-4 shows the inter-relationships of the three (3) architectures and their components.
+Color coding (i.e., black and white shading) distinguishes the three (3) architectures.
+Front Matter FM 6 – Page 16
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Figure 6-4. Architectural Component Relationships
+Front Matter FM 6 – Page 17
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+Walkthrough of the BA, IA, and TA Components
+The following text provides a narrative walkthrough of Figure 6-4, Architectural Component
+Relationships, and the components of the BA, IA, and TA.
+BUSINESS ARCHITECTURE
+The top left of Figure 6-4 represents the BA.
+The COO is the structure for defining the
+Medicaid Enterprise vision. It includes
+operational scenarios to show a
+transformation of the Medicaid Enterprise
+over time from the As-Is operations to the
+To-Be environment. The COO influences the
+contents of the CDM.
+The COO provides the base for the
+development of the BPM. The COO includes
+business improvements that begin to define
+the BCM.
+The COO is also the point of reference for
+the MMM. The MMM describes five (5) levels
+of maturity to illustrate the migration from the
+As-Is operations to the To-Be environment.
+Applying the MMM to a business process produces multiple business capability statements
+for each level of maturity tailored to the specific business process.
+Each business process description provides trigger events, expected results, and shared
+data that maps to the CDM. Business capability descriptions map to the LDM.
+It is also possible to start the journey by defining the CDM based on the Medicaid
+mission and goals. In this case, the CDM becomes the driver of the BPM.
+Front Matter FM 6 – Page 18
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+INFORMATION ARCHITECTURE
+The center of Figure 6-4 contains three (3)
+IA components: CDM, LDM, and Data
+Standards. The CDM identifies the core
+subject areas and groupings of data (or
+entities) important to the Medicaid
+Enterprise. The CDM links to the major
+business areas in the BA.
+For example, the Provider Management
+business area requires entities (e.g.,
+provider, group practice, location) and
+relationships (e.g., provider has an address)
+for conducting operations. Business process
+descriptions contain information for CDM
+details (e.g., provider demographic data and
+licensing board data). The CDM also houses
+data groupings for use in technical areas and technical functions. For example,
+authentication requires security tokens found in the CDM.
+The LDM adds detail to the CDM by further defining attributes, related standards, and entity
+relationships. For example, the LDM defines a provider by National Provider Identifier (NPI),
+taxonomy, name, and other attributes. The LDM presents attributes with more detail.
+The LDM maps to specific business capabilities. For example, a beneficiary is able to inquire
+about his or her treatment history based on claims data at Level 3 and views personal clinical
+data at Level 4. The LDM also maps to specific technical capabilities (e.g., a personal key
+identifier entity required to support the technical capability, “Authenticate Provider,” at Level
+3).
+Each business service and technical service uses messages and interfaces contained in the
+LDM. The LDM references, where possible, existing nationally recognized data standards.
+These are industry standards maintained by official Standards Development Organizations
+(SDO) such as ASC X12N, Health Level Seven International (HL7), and NCPDP.
+Business and Technical Services use specific industry data standards. The Framework uses
+data standards produced by Designated Standards Maintenance Organizations (DSMO),
+whenever available. If such standards are not available, CMS supports collaboration efforts
+with industry groups across standards organizations where appropriate. CMS continues to
+collaborate with other federal agencies and industry groups in harmonizing data standards
+across disparate groups. Because data standards are quite dynamic, States will need to
+conduct a periodic review of the available data standards and versions to keep the data
+standards current.
+Front Matter FM 6 – Page 19
+February 2012
+Version 3.0
+FM 6 – Introduction to the MITA Framework
+Front Matter
+TECHNICAL ARCHITECTURE
+As in the BA, the TA is a grouping of Functions. The TA
+assigns functions to five (5) levels of Technical Capabilities.
+For example, Security is a Technical Area that contains an
+Authentication Function (among others).
+The Authentication Function has different Technical
+Capabilities corresponding to the Maturity Model 1 – 5 Levels.
+Authenticate Provider at Level 2 uses an Electronic Data
+Interchange (EDI) message between the provider and the
+SMA; at Level 3 it uses a Public Key Infrastructure (PKI).
+There is a loose link between the Business Capability and the
+Technical Capability at Level 3. Technical capabilities are
+enablers of business processes. Each Business and
+Technical Capability at Level 3 and above has a business and
+technical service.
+Both business services and technical services
+use one or more solution sets containing
+instructions for the development of the
+service. Business services are associated with
+business processes (e.g., Provider
+Enrollment), and technical services are
+associated with technical functions (e.g.,
+Authentication).
+A business service solution set may require use of
+specific technical services. For example, Enroll Provider,
+Level 3, requires encryption provided by a Technical
+Service at Level 3. A technical service defined for a Level
+3 or above Business Capability uses technology
+standards associated with that level.
+The final component of the Technical Architecture is the
+AA, that defines the environment and orchestrates the
+business and technical services.
+Reading the MITA Framework
+The MITA Framework for the Medicaid Enterprise includes the following organization:
+ Part I – Business Architecture: defines business activity and maturity determinations.
+ Part II – Information Architecture: defines data relationships and industry standards to
+support business activity.
+ Part III – Technical Architecture: defines sets of business and technical services, their
+connectivity, and standards to support Part I and II.
+Front Matter FM 6 – Page 20
+February 2012
+Version 3.0
+Front Matter
+FM 6 – Introduction to the MITA Framework
+ SS-A Companion Guide – State Self-Assessment: defines the process for conducting
+the SS-A.
+Due to the size and complexity of the document, the Table of Contents and the details in this
+Introduction to the MITA Framework serve as a roadmap for readers. CMS encourages all
+readers to begin with the Overview of the MITA Initiative, the Introduction to the MITA
+Framework, the introduction chapter for Parts I, II, and III, as well as the SS-A Companion
+Guide.
+The MITA initiative is a work in progress, and the Framework only captures the components
+as they exist at the time of publication. Through the collaboration of the SMA, CMS, and the
+vendor community, as well as coordination with national and federal initiatives, CMS seeks to
+continuously improve the products and tools in this MITA Framework document.
+The MITA team welcomes all comments and questions from the readers, and CMS intends to
+incorporate responses to these communications into future releases of the Framework.
+Front Matter FM 6 – Page 21
+February 2012
+Version 3.0
