@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compliance Dashboard — AI-Native Compliance Infrastructure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #16242B;
+    --panel: #1C2E36;
+    --panel-raised: #22363F;
+    --ink: #ECF2F1;
+    --ink-muted: #91A5A3;
+    --ink-faint: #5E7370;
+    --line: #2C4048;
+    --amber: #E0913F;
+    --amber-bg: rgba(224,145,63,0.12);
+    --green: #57B98A;
+    --green-bg: rgba(87,185,138,0.12);
+    --red: #E0715F;
+    --red-bg: rgba(224,113,95,0.12);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image: radial-gradient(circle at 15% 0%, rgba(87,185,138,0.06), transparent 45%);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 48px 24px 100px; }
+
+  /* Header */
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--green); font-weight: 600; display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 0 rgba(87,185,138,0.5); animation: pulseDot 2.2s ease-out infinite; }
+  @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(87,185,138,0.45); } 70% { box-shadow: 0 0 0 7px rgba(87,185,138,0); } 100% { box-shadow: 0 0 0 0 rgba(87,185,138,0); } }
+
+  h1 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: clamp(30px, 4.5vw, 40px); font-weight: 700; letter-spacing: -0.01em;
+    margin: 0 0 10px;
+  }
+  .sub { color: var(--ink-muted); font-size: 15px; max-width: 600px; line-height: 1.6; margin-bottom: 40px; }
+
+  /* Pipeline strip — signature element */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+    margin-bottom: 44px;
+  }
+  .pipeline::before {
+    content: "";
+    position: absolute;
+    top: 27px; left: 6%; right: 6%;
+    height: 2px;
+    background: var(--line);
+    z-index: 0;
+  }
+  .pipeline::after {
+    content: "";
+    position: absolute;
+    top: 27px; left: 6%;
+    width: 88%; height: 2px;
+    background: linear-gradient(90deg, var(--green), var(--amber) 60%, var(--green) 100%);
+    background-size: 220% 100%;
+    z-index: 0;
+    opacity: 0.9;
+    animation: flow 3.4s linear infinite;
+  }
+  @keyframes flow { from { background-position: 220% 0; } to { background-position: 0% 0; } }
+
+  .stage { position: relative; z-index: 1; text-align: center; padding: 0 8px; }
+  .stage-node {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: var(--panel-raised); border: 2px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px; font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 18px;
+    color: var(--ink-muted);
+  }
+  .stage.active .stage-node { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .stage-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
+  .stage-count { font-size: 11.5px; color: var(--ink-faint); }
+
+  /* KPI strip */
+  .kpis {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+    margin-bottom: 44px;
+  }
+  .kpi { background: var(--panel); padding: 20px 22px; }
+  .kpi-val { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 700; color: var(--ink); }
+  .kpi-label { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+
+  /* Section label */
+  .section-title {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-faint); font-weight: 600; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  /* Policy card */
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    margin-bottom: 20px; overflow: hidden;
+  }
+  .card-head {
+    padding: 20px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .card-title { font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 6px; }
+  .version-row { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-muted); }
+  .version-row .old { text-decoration: line-through; color: var(--red); opacity: 0.8; }
+  .version-row .new { color: var(--green); font-weight: 600; }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 5px 11px; border-radius: 999px; white-space: nowrap;
+    background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(224,145,63,0.3);
+  }
+
+  .card-body { padding: 20px 24px; }
+  .changes-list { list-style: none; margin: 0; padding: 0; }
+  .changes-list li {
+    font-size: 13.5px; color: var(--ink); padding: 8px 0 8px 20px; position: relative;
+    border-bottom: 1px dashed var(--line);
+  }
+  .changes-list li:last-child { border-bottom: none; }
+  .changes-list li::before { content: "→"; position: absolute; left: 0; color: var(--amber); font-weight: 700; }
+  .changes-list b { color: var(--green); font-family: 'IBM Plex Mono', monospace; }
+
+  .affected-row { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .affected-label { font-size: 11.5px; color: var(--ink-faint); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 4px; }
+  .chip {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;
+    background: var(--panel-raised); border: 1px solid var(--line); color: var(--ink);
+    padding: 5px 10px; border-radius: 5px; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .chip::before { content: "✓"; color: var(--green); }
+
+  .drafts { margin-top: 18px; }
+  .draft-toggle {
+    background: none; border: 1px solid var(--line); color: var(--ink-muted);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 8px 14px; border-radius: 5px;
+    cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .draft-toggle:hover { border-color: var(--green); color: var(--green); }
+  .draft-toggle:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .draft-toggle .chevron { margin-left: auto; transition: transform 0.2s ease; }
+  .draft-toggle.open .chevron { transform: rotate(90deg); }
+
+  .draft-panel { display: none; margin-top: 10px; }
+  .draft-panel.open { display: block; }
+  .draft-item {
+    background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px;
+    padding: 16px; margin-bottom: 10px;
+  }
+  .draft-item:last-child { margin-bottom: 0; }
+  .draft-item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .draft-id { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 700; background: var(--line); color: var(--ink); padding: 2px 7px; border-radius: 3px; }
+  .draft-item-title { font-size: 13.5px; font-weight: 600; }
+  .draft-text { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.75; color: var(--ink); }
+  .draft-cite { margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 5px; }
+  .draft-cite::before { content: "✓"; }
+
+  .draft-flag { margin-top: 10px; padding: 7px 11px; background: var(--amber-bg); border: 1px solid rgba(224,145,63,0.3); border-radius: 5px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--amber); line-height: 1.6; }
+  footer {
+    max-width: 1040px; margin: 40px auto 0; padding: 0 24px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-faint);
+    border-top: 1px solid var(--line); padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow"><span class="dot"></span>Live Monitoring — AI-Native Compliance Infrastructure</div>
+  <h1>Compliance Dashboard</h1>
+  <p class="sub">Tracking Medicaid policy changes end to end — from raw regulatory text to a cited, reviewable draft update.</p>
+
+  <div class="pipeline">
+    <div class="stage active">
+      <div class="stage-node">3</div>
+      <div class="stage-label">Ingest</div>
+      <div class="stage-count">docs monitored</div>
+    </div>
+    <div class="stage active">
+      <div class="stage-node">1</div>
+      <div class="stage-label">Detect</div>
+      <div class="stage-count">change found</div>
+    </div>
+    <div class="stage active">
+      <div class="stage-node">2</div>
+      <div class="stage-label">Map Impact</div>
+      <div class="stage-count">procedures affected</div>
+    </div>
+    <div class="stage active">
+      <div class="stage-node">2</div>
+      <div class="stage-label">Draft</div>
+      <div class="stage-count">updates ready</div>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-val">2 of 3</div>
+      <div class="kpi-label">Procedures flagged as affected - telehealth correctly left alone</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">Free-tier</div>
+      <div class="kpi-label">Runs entirely on Kaggle GPU — no local hardware</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">Pending</div>
+      <div class="kpi-label">Every draft awaits human review before use</div>
+    </div>
+  </div>
+
+  <div class="section-title">Active Compliance Alerts</div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title">Prior Authorization — Outpatient PT</h2>
+        <div class="version-row">
+          <span class="old">v1 · eff. 2026-01-01</span> &nbsp;→&nbsp;
+          <span class="new">v2 · eff. 2026-07-01</span>
+        </div>
+      </div>
+      <span class="badge">Pending Review</span>
+    </div>
+    <div class="card-body">
+      <ul class="changes-list">
+        <li>Visit threshold for requiring prior authorization: <b>12 → 20 visits</b></li>
+        <li>Submission deadline: <b>5 business days → 3 business days</b></li>
+        <li>Trigger point: <b>13th visit → 21st visit</b></li>
+      </ul>
+
+      <div class="affected-row">
+        <span class="affected-label">Affected procedures</span>
+        <span class="chip">sop_001 — Outpatient PT Intake</span>
+        <span class="chip">sop_002 — Claims Denial Appeals</span>
+      </div>
+
+      <div class="drafts">
+        <button class="draft-toggle" onclick="toggleDraft(this)">
+          <span>View drafted updates (2)</span>
+          <span class="chevron">›</span>
+        </button>
+        <div class="draft-panel">
+          <div class="draft-item">
+            <div class="draft-item-head">
+              <span class="draft-id">SOP_001</span>
+              <span class="draft-item-title">Outpatient PT Intake Procedure</span>
+            </div>
+            <div class="draft-text">Front desk staff verify visit count against the 20-visit prior authorization threshold before scheduling. If a patient exceeds 20 visits, flag for prior auth. The prior auth must be submitted within 3 business days. The visit count for submission is before the 21st visit.</div>
+            <div class="draft-flag"><b>New clause - verify:</b> The prior auth must be submitted within 3 business days.</div>
+            <div class="draft-flag"><b>New clause - verify:</b> The visit count for submission is before the 21st visit.</div>
+            <div class="draft-cite">Source: Prior Authorization Policy — Outpatient Services (v2) — effective 2026-07-01</div>
+          </div>
+          <div class="draft-item">
+            <div class="draft-item-head">
+              <span class="draft-id">SOP_002</span>
+              <span class="draft-item-title">Claims Denial Appeals Process</span>
+            </div>
+            <div class="draft-text">Appeals for denied physical therapy claims must reference the prior authorization policy visit threshold and the 3-business-day submission window. The threshold for prior authorization is increased to 20 visits, and the visit count for submission is changed to "before the 21st visit."</div>
+            <div class="draft-flag"><b>New clause - verify:</b> The threshold for prior authorization is increased to 20 visits, and the visit count for submission is changed to "before the 21st visit."</div>
+            <div class="draft-cite">Source: Prior Authorization Policy — Outpatient Services (v2) — effective 2026-07-01</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Monitored — No Action Needed</div>
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title">Telehealth Reimbursement Policy</h2>
+        <div class="version-row"><span class="new">v1 · eff. 2026-01-01 — no newer version detected</span></div>
+      </div>
+      <span class="badge" style="background: var(--green-bg); color: var(--green); border-color: rgba(87,185,138,0.3);">Current</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Sample dashboard built from a real generated run — public CMS/Medicaid text and synthetic internal procedures only. No client or proprietary data.
+</footer>
+
+<script>
+function toggleDraft(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+  const label = btn.querySelector('span');
+  label.textContent = btn.classList.contains('open') ? 'Hide drafted updates (2)' : 'View drafted updates (2)';
+}
+</script>
+</body>
+</html>

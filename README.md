@@ -1,51 +1,79 @@
-# Compliance AI Agent
+# AI-Native Compliance Infrastructure
 
-A prototype that helps a compliance analyst identify the impact of a policy update. It compares policy versions, identifies potentially affected internal procedures, drafts proposed updates, and packages the results for human review.
+A RAG prototype that detects Medicaid policy changes between document versions, finds the
+internal procedures (SOPs) those changes affect, and drafts updated procedure text with
+citations to the source policy.
 
-**Status:** Kaggle notebook prototype through Phase 4. The web interface and formal evaluation are planned.
+Built on a free Kaggle GPU using only public CMS-style policy text and synthetic internal
+procedures. No proprietary, client or employer data is used anywhere in this repository.
 
-## What it does
+## The problem
 
-1. **Answers policy questions:** Loads sample policy text or public PDFs, retrieves relevant passages, and generates an answer grounded in those passages.
-2. **Detects policy changes:** Pairs older and newer versions of a policy and summarizes what changed.
-3. **Maps operational impact:** Identifies sample internal standard operating procedures (SOPs) that may be affected.
-4. **Drafts procedure updates:** Generates proposed language for affected SOPs, referencing the newer policy and its effective date.
-5. **Exports reviewable results:** Returns a structured result from `run_full_compliance_check()` and writes `compliance_results.json` for a future UI.
-
-## Example workflow
-
-**Sample policy change:** Prior authorization for outpatient physical therapy changes from **more than 12 visits** to **more than 20 visits** per calendar year. The advance submission period changes from **5 business days** to **3 business days**.
-
-The prototype compares the two policy versions, summarizes those changes, identifies potentially affected sample SOPs, and drafts proposed procedure text. The output is marked `drafts_ready_for_review`; a compliance analyst must verify it before use.
+When a Medicaid policy changes, someone has to read it, work out which internal procedures
+are affected, and rewrite them by hand. That is slow and easy to get wrong, and mistakes
+show up later as audit findings.
 
 ## How it works
 
-| Component | Implementation |
+![Swim-lane diagram of the pipeline and what is done vs next](docs/swimlane.png)
+
+Green solid boxes are built and tested. Amber dashed boxes are next steps.
+
+1. **Ingest** - split policy text into chunks and embed them (all-MiniLM-L6-v2, FAISS)
+2. **Detect changes** - compare old and new versions of the same policy with an LLM
+3. **Map impact** - for each SOP, structured JSON says affected or not, with a reason
+4. **Draft** - rewrite only the affected numbers in each affected SOP, with citation
+5. **Flag** - any sentence in a draft that does not closely match the original SOP is
+   marked for human review
+
+## Results on the sample data
+
+Change tested: prior-authorization threshold raised from 15 to 20 visits.
+
+- 2 of 3 SOPs flagged as affected (PT intake, claims appeals)
+- The telehealth SOP was correctly left alone (an earlier string-matching bug flagged it;
+  fixed with structured JSON output and a negation-aware fallback parser)
+- The model still sometimes adds sentences the policy never asked for. These are caught by
+  the new-clause flagger and shown to the reviewer, not silently accepted.
+
+## Honest status
+
+- Prototype validated on **one synthetic change set**. No accuracy numbers yet.
+- Not tested on real versioned CMS or state documents.
+- Market need is **unvalidated**: a first practitioner conversation suggested the current
+  manual process may already be good enough. Customer interviews come before more building.
+
+## Repo layout
+
+```
+notebooks/   Kaggle notebooks, in run order (starter, phase 3 diff, phase 4 drafting)
+patches/     Paste-in cells: structured impact fix, stricter draft prompt + flagger
+demo/        compliance_demo.html (redline view), compliance_dashboard.html - open in a browser
+data/        compliance_results.json - output of a real run
+docs/        Swim-lane diagram, project overview PDF, slide deck PDF, setup guide
+```
+
+## Run it
+
+1. On Kaggle: Create > New Notebook > File > Import Notebook
+2. Settings: Accelerator GPU T4 x2, Internet on (phone verification required)
+3. Run the notebooks in order, then the two cells in `patches/`
+4. Open `demo/compliance_demo.html` to view the redlines
+
+## Stack
+
+| Part | Choice |
 |---|---|
-| Document ingestion | Sample text, with an optional public-PDF loader using `pypdf` |
-| Chunking | Word-based chunks with overlap |
-| Retrieval | `all-MiniLM-L6-v2` embeddings and a FAISS index |
-| Generation | `Qwen2.5-7B-Instruct` loaded in 4-bit quantization |
-| Change and impact analysis | Prompts comparing policy versions and sample SOPs |
-| Output | Structured Python dictionaries and `compliance_results.json` |
+| Generation | Qwen2.5-7B-Instruct, 4-bit |
+| Embeddings | sentence-transformers all-MiniLM-L6-v2 |
+| Search | FAISS |
+| Compute | Kaggle T4 x2 |
 
-## Run the prototype
+## Roadmap
 
-1. Import the notebook into **Kaggle**.
-2. Enable a GPU accelerator in the notebook settings.
-3. Run the cells in order, starting with dependency installation.
-4. Start with the included synthetic sample policies and SOPs. Optionally add public policy PDFs through Kaggle’s **Add Data** panel and update the PDF folder path in the notebook.
-5. Review the generated report and download `compliance_results.json` from `/kaggle/working/`.
-
-## Data and review boundaries
-
-The included policy examples and internal SOPs are **synthetic**. The optional PDF loader is intended for **public** documents. Do not upload employer documents, confidential procedures, or protected health information.
-
-Generated change summaries, impact mappings, and procedure drafts are proposals. A qualified reviewer must check them against the source policy before making an operational or compliance decision.
-
-## Current limitations and next steps
-
-- The prototype has not been validated against a labeled evaluation set; no accuracy or time-savings claim is made.
-- Impact identification and draft quality need systematic testing, including missed changes and incorrect SOP mappings.
-- The Phase 5 web interface is planned. The current JSON export provides sample data for building it.
-- Future work includes source-level citations, reviewer approval and edit tracking, and tests using real public policy updates.
+- [x] Ingest, retrieve, change detection, impact mapping, draft generation
+- [x] Fix wrong-SOP flagging; add human-review flags for invented clauses
+- [ ] Accuracy check: 10-15 hand-labelled changes, report hit rate
+- [ ] Run on real public versioned CMS documents
+- [ ] Customer interviews (agency, vendor, other-state practitioners) - decide build, pivot or stop
+- [ ] Hosted backend so results persist

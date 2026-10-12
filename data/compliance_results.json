@@ -1,0 +1,42 @@
+[
+  {
+    "policy_family": "prior_auth_outpatient_pt",
+    "old_version": {
+      "title": "Prior Authorization Policy \u2014 Outpatient Services (Sample, v1)",
+      "effective_date": "2026-01-01"
+    },
+    "new_version": {
+      "title": "Prior Authorization Policy \u2014 Outpatient Services (Sample, v2 - UPDATED)",
+      "effective_date": "2026-07-01"
+    },
+    "changes_summary": "- **Threshold for Prior Authorization:** Increased from 12 visits to 20 visits.\n- **Deadline for Submission:** Reduced from 5 business days to 3 business days.\n- **Visit Count for Submission:** Changed from \"before the 13th visit\" to \"before the 21st visit.\"",
+    "impact_analysis": "[sop_001] AFFECTED: Updated visit threshold from 12 to 20.\n[sop_002] AFFECTED: Updated visit threshold from 12 to 20 and submission window from 5 to 3 business days.\n[sop_003] not affected: No related changes.",
+    "impact_parse_method": "json",
+    "affected_sop_ids": [
+      "sop_001",
+      "sop_002"
+    ],
+    "drafted_updates": [
+      {
+        "sop_id": "sop_001",
+        "sop_title": "Outpatient PT Intake Procedure",
+        "original_text": "Front desk staff verify visit count against the 12-visit prior authorization threshold before scheduling. If a patient exceeds 12 visits, flag for prior auth.",
+        "draft_text": "Front desk staff verify visit count against the 20-visit prior authorization threshold before scheduling. If a patient exceeds 20 visits, flag for prior auth. The prior auth must be submitted within 3 business days. The visit count for submission is before the 21st visit.",
+        "review_flags": [
+          "The prior auth must be submitted within 3 business days.",
+          "The visit count for submission is before the 21st visit."
+        ]
+      },
+      {
+        "sop_id": "sop_002",
+        "sop_title": "Claims Denial Appeals Process",
+        "original_text": "Appeals for denied physical therapy claims must reference the prior authorization policy visit threshold and the 5-business-day submission window.",
+        "draft_text": "Appeals for denied physical therapy claims must reference the prior authorization policy visit threshold and the 3-business-day submission window. The threshold for prior authorization is increased to 20 visits, and the visit count for submission is changed to \"before the 21st visit.\"",
+        "review_flags": [
+          "The threshold for prior authorization is increased to 20 visits, and the visit count for submission is changed to \"before the 21st visit.\""
+        ]
+      }
+    ],
+    "status": "drafts_ready_for_review"
+  }
+]
