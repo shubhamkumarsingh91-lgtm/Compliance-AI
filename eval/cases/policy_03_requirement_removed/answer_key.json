@@ -1,0 +1,24 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "Paper copy requirement removed",
+      "key_terms": [
+        "paper copy"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_x1"
+  ],
+  "edits": {
+    "sop_x1": {
+      "must_contain": [
+        "10 days"
+      ],
+      "must_not_contain": [
+        "mail a paper copy"
+      ]
+    }
+  }
+}

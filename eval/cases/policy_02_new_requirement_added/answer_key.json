@@ -1,0 +1,24 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "New audit log requirement, 7-year retention",
+      "key_terms": [
+        "audit log",
+        "7"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_r1"
+  ],
+  "edits": {
+    "sop_r1": {
+      "must_contain": [
+        "audit log",
+        "7 years"
+      ],
+      "must_not_contain": []
+    }
+  }
+}

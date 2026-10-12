@@ -1,0 +1,62 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "ORR lead time 45 -> 60 days",
+      "key_terms": [
+        "45",
+        "60"
+      ]
+    },
+    {
+      "id": "k2",
+      "desc": "IV&V report cadence 60 -> 30 days",
+      "key_terms": [
+        "60",
+        "30"
+      ]
+    },
+    {
+      "id": "k3",
+      "desc": "EVV criteria added",
+      "key_terms": [
+        [
+          "EVV",
+          "Electronic Visit Verification"
+        ]
+      ]
+    }
+  ],
+  "affected": [
+    "sop_c1",
+    "sop_c2",
+    "sop_c4"
+  ],
+  "edits": {
+    "sop_c1": {
+      "must_contain": [
+        "60"
+      ],
+      "must_not_contain": [
+        "45"
+      ]
+    },
+    "sop_c2": {
+      "must_contain": [
+        "30"
+      ],
+      "must_not_contain": [
+        "60 days"
+      ]
+    },
+    "sop_c4": {
+      "must_contain": [
+        [
+          "EVV",
+          "Electronic Visit Verification"
+        ]
+      ],
+      "must_not_contain": []
+    }
+  }
+}

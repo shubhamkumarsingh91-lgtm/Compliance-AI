@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Records Access Policy (v1)
+
+Providers must respond to records requests within 30 days.

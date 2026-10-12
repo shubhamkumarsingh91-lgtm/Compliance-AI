@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Timely Filing Policy (v2)
+
+Claims must be submitted by providers within 90 days from the date of service.

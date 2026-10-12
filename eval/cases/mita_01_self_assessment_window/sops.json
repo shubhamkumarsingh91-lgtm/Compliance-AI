@@ -1,0 +1,17 @@
+[
+  {
+    "id": "sop_m1",
+    "title": "Self-Assessment Project Plan",
+    "text": "The assessment team plans to finish the State Self-Assessment within 12 months of the framework release."
+  },
+  {
+    "id": "sop_m2",
+    "title": "Maturity Scoring Guide",
+    "text": "Score each business process at a capability maturity level from 1 through 5 and record the evidence."
+  },
+  {
+    "id": "sop_m3",
+    "title": "Assessment Refresh Calendar",
+    "text": "Schedule a refresh of the self-assessment every 5 years and notify the architecture board."
+  }
+]

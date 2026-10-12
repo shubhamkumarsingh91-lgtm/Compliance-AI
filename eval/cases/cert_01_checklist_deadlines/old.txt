@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Certification Milestone Guide (v1)
+
+The State must submit Operational Readiness Review (ORR) artifacts at least 45 calendar days before the planned go-live date. The Independent Verification and Validation (IV&V) vendor must deliver a progress report every 60 days. The State must retain certification artifacts for 6 years.

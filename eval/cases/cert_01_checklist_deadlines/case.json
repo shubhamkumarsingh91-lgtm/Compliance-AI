@@ -1,0 +1,9 @@
+{
+  "case_id": "cert_01_checklist_deadlines",
+  "category": "certification",
+  "modeled_on": "Kinds of changes seen when CMS revises its Medicaid Enterprise Certification Toolkit (timing changes, new criteria). Numbers here are invented.",
+  "policy_family": "sample_certification_milestone_guide",
+  "old_effective": "2018-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Architecture Self-Assessment Guide (v2)
+
+States must complete the State Self-Assessment within 18 months of the framework release. Capability maturity levels are rated 1 through 5. The assessment must be refreshed every 3 years.

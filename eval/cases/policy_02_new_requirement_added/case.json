@@ -1,0 +1,9 @@
+{
+  "case_id": "policy_02_new_requirement_added",
+  "category": "policy",
+  "modeled_on": "A brand-new obligation added with no number changed (the hardest kind to catch with keyword matching). Invented.",
+  "policy_family": "sample_records_access_policy",
+  "old_effective": "2024-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

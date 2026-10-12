@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Prior Authorization Policy for Outpatient PT (v2)
+
+Prior authorization is required after 20 visits in a benefit year. Requests must be submitted within 3 business days of the 20th visit.

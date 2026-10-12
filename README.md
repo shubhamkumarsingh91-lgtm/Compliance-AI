@@ -48,6 +48,7 @@ Change tested: prior-authorization threshold raised from 15 to 20 visits.
 ## Repo layout
 
 ```
+eval/        Test harness: 6 synthetic old/new policy cases with answer keys, scorer, real-document fetcher
 notebooks/   Kaggle notebooks, in run order (starter, phase 3 diff, phase 4 drafting)
 patches/     Paste-in cells: structured impact fix, stricter draft prompt + flagger
 demo/        compliance_demo.html (redline view), compliance_dashboard.html - open in a browser
@@ -75,7 +76,9 @@ docs/        Swim-lane diagram, project overview PDF, setup guide
 
 - [x] Ingest, retrieve, change detection, impact mapping, draft generation
 - [x] Fix wrong-SOP flagging; add human-review flags for invented clauses
-- [ ] Accuracy check: 10-15 hand-labelled changes, report hit rate
+- [x] Test harness built: 6 synthetic cases (certification, MITA-style, policy, control) with answer keys - see `eval/`
+- [ ] Run the harness on the real model and publish the numbers
+- [ ] Grow to 20+ cases and add real old/new public document pairs
 - [ ] Run on real public versioned CMS documents
 - [ ] Customer interviews (agency, vendor, other-state practitioners) - decide build, pivot or stop
 - [ ] Hosted backend so results persist

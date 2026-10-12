@@ -1,0 +1,17 @@
+[
+  {
+    "id": "sop_p1",
+    "title": "Outpatient PT Intake",
+    "text": "Front desk staff verify the visit count against the 15-visit prior authorization threshold before scheduling."
+  },
+  {
+    "id": "sop_p2",
+    "title": "Prior Auth Submission",
+    "text": "Submit prior authorization requests within 5 business days of the 15th visit."
+  },
+  {
+    "id": "sop_p3",
+    "title": "Telehealth Billing Checklist",
+    "text": "Confirm the modality (audio-only or video) is documented on every telehealth claim before submission."
+  }
+]

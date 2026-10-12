@@ -1,0 +1,19 @@
+{
+  "note": "Candidates only. Related public CMS documents; open each one and confirm it is a genuine old/new pair before trusting any score. Add your own pairs here.",
+  "pairs": [
+    {
+      "name": "mita_announcements_2011_2012",
+      "category": "mita",
+      "status": "candidate - these are two related bulletins, not two versions of one document",
+      "old_url": "https://www.medicaid.gov/federal-policy-guidance/downloads/CIB-11-15-11.pdf",
+      "new_url": "https://www.medicaid.gov/federal-policy-guidance/downloads/CIB-03-28-12.pdf"
+    },
+    {
+      "name": "mect_2007_vs_2_3",
+      "category": "certification",
+      "status": "TODO - find the 2007 toolkit files (not listed on the current MECT page) and pair with MECT 2.3 (Appendix G maps 2007 criteria to 2.3)",
+      "old_url": "",
+      "new_url": "https://www.hhs.gov/guidance/sites/default/files/hhs-guidance-documents/CMS/00-mect-2_3-welcome-release-notes.pdf"
+    }
+  ]
+}

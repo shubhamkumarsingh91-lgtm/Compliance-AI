@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sop_r1",
+    "title": "Records Request Handling",
+    "text": "Respond to every records request within 30 days and log the response date in the tracker."
+  },
+  {
+    "id": "sop_r2",
+    "title": "Staff Onboarding",
+    "text": "New staff complete privacy training in their first week and sign the acknowledgment form."
+  }
+]

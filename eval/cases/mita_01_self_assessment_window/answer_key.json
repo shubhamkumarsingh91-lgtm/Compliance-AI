@@ -1,0 +1,42 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "Completion window 12 -> 18 months",
+      "key_terms": [
+        "12",
+        "18"
+      ]
+    },
+    {
+      "id": "k2",
+      "desc": "Refresh cycle 5 -> 3 years",
+      "key_terms": [
+        "5",
+        "3"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_m1",
+    "sop_m3"
+  ],
+  "edits": {
+    "sop_m1": {
+      "must_contain": [
+        "18"
+      ],
+      "must_not_contain": [
+        "12 months"
+      ]
+    },
+    "sop_m3": {
+      "must_contain": [
+        "3 years"
+      ],
+      "must_not_contain": [
+        "5 years"
+      ]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "case_id": "policy_01_prior_auth_threshold",
+  "category": "policy",
+  "modeled_on": "Threshold and deadline changes typical of Medicaid benefit policy updates. Numbers here are invented.",
+  "policy_family": "sample_prior_auth_outpatient_pt",
+  "old_effective": "2025-01-01",
+  "new_effective": "2026-07-01",
+  "data": "synthetic"
+}

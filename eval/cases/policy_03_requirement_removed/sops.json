@@ -1,0 +1,12 @@
+[
+  {
+    "id": "sop_x1",
+    "title": "Claim Submission Packet",
+    "text": "Submit Form X electronically and mail a paper copy within 10 days of the date of service."
+  },
+  {
+    "id": "sop_x2",
+    "title": "Patient Billing Statements",
+    "text": "Mail patient statements on the first business day of each month."
+  }
+]

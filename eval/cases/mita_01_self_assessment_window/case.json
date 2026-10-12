@@ -1,0 +1,9 @@
+{
+  "case_id": "mita_01_self_assessment_window",
+  "category": "mita",
+  "modeled_on": "Kinds of changes seen when CMS revises the MITA framework (assessment timing and refresh cycles). Numbers here are invented.",
+  "policy_family": "sample_architecture_self_assessment_guide",
+  "old_effective": "2012-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

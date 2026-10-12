@@ -1,0 +1,22 @@
+[
+  {
+    "id": "sop_c1",
+    "title": "ORR Submission Planning",
+    "text": "Project manager schedules ORR artifact submission 45 calendar days before the planned go-live date."
+  },
+  {
+    "id": "sop_c2",
+    "title": "IV&V Reporting Cadence",
+    "text": "Request an IV&V progress report from the vendor every 60 days and file it in the project repository."
+  },
+  {
+    "id": "sop_c3",
+    "title": "Artifact Retention",
+    "text": "Keep certification artifacts for 6 years and store them in the records system."
+  },
+  {
+    "id": "sop_c4",
+    "title": "Program Integrity Checklist Prep",
+    "text": "Complete the program integrity checklist covering claims edits and provider screening before the ORR."
+  }
+]

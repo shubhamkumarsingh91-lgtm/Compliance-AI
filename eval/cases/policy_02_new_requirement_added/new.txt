@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Records Access Policy (v2)
+
+Providers must respond to records requests within 30 days. Providers must also maintain an access audit log of all electronic records requests and retain it for 7 years.

@@ -1,0 +1,9 @@
+{
+  "case_id": "policy_03_requirement_removed",
+  "category": "policy",
+  "modeled_on": "An obligation removed (paper copy no longer required). Invented.",
+  "policy_family": "sample_claim_submission_policy",
+  "old_effective": "2023-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

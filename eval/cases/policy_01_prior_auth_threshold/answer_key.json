@@ -1,0 +1,42 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "Visit threshold 15 -> 20",
+      "key_terms": [
+        "15",
+        "20"
+      ]
+    },
+    {
+      "id": "k2",
+      "desc": "Submission window 5 -> 3 business days",
+      "key_terms": [
+        "5",
+        "3"
+      ]
+    }
+  ],
+  "affected": [
+    "sop_p1",
+    "sop_p2"
+  ],
+  "edits": {
+    "sop_p1": {
+      "must_contain": [
+        "20"
+      ],
+      "must_not_contain": [
+        "15"
+      ]
+    },
+    "sop_p2": {
+      "must_contain": [
+        "3 business days"
+      ],
+      "must_not_contain": [
+        "5 business days"
+      ]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "case_id": "control_01_wording_only",
+  "category": "control",
+  "modeled_on": "Negative control: wording changes only, no substantive change. The tool should flag nothing. Invented.",
+  "policy_family": "sample_timely_filing_policy",
+  "old_effective": "2024-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}
