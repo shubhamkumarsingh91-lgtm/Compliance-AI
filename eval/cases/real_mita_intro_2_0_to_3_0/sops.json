@@ -1,8 +1,8 @@
 [
   {
     "id": "sop_i1",
-    "title": "Business Process Inventory (synthetic)",
-    "text": "Maintain an inventory that covers all 8 MITA business areas and 78 business processes, and review it each quarter."
+    "title": "Business Area Inventory (synthetic)",
+    "text": "Maintain an inventory that covers all 8 MITA business areas and review it each quarter."
   },
   {
     "id": "sop_i2",

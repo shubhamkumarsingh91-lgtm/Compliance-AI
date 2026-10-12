@@ -64,14 +64,18 @@ and a true old/new pair of the same document still needs to be chosen and verifi
   Read the failures before trusting the percentages.
 - Synthetic documents are cleaner than real ones. Real-document scores will likely be lower.
 
-## First real case: MITA introduction, 2.0 to 3.0
+## First real case: MITA introduction (FM6), 2.0 to 3.0
 
-`cases/real_mita_intro_2_0_to_3_0/` pairs the 2006 "Introduction to the MITA Framework Release 2.0" slides
-with the 2012 MITA 3.0 introduction (Front Matter FM 6). Both are public CMS documents, already extracted
-to text, so no download is needed. The 2.0 slides say 8 business areas and 78 business processes; the 3.0
-document says ten business areas and 80 business processes, with five maturity levels in both. The answer
-key is verified against both documents and was written before any AI run. SOPs are synthetic. One SOP
-(maturity scoring) must NOT be flagged because the 1-5 scale did not change.
+`cases/real_mita_intro_2_0_to_3_0/` pairs the 2006 "FM6 - Introduction to MITA Framework 2.0" (18 pages) with
+the 2012 "FM6 Introduction to the MITA Framework 3.0" (21 pages): same title, same format, two real versions,
+both public CMS documents, already extracted to text. The verified change is eight business areas (2.0) to
+ten (3.0). Both describe five maturity levels, so the maturity-scoring SOP must NOT be flagged. The answer key
+was written from the documents before any AI run. SOPs are synthetic.
 
-This is the hard test: the new document is about 5,600 words of prose and the old one is slide text, so
-expect the model to struggle. Report the real score either way.
+This is the hard test: about 10,500 words across the two documents, with a single number buried in prose.
+Expect the model to struggle, and report the real score either way. If it fails, the likely fix is comparing
+matching sections instead of whole documents.
+
+More real pairs are available in the full MITA 2.0 and 3.0 packages (for example Part I Chapter 3, the maturity
+model, where 3.0 revised the Level 4 and 5 definitions) but they change in wording rather than numbers, so each
+needs a hand-written key before use.

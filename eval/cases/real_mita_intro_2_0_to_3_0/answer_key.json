@@ -2,18 +2,10 @@
   "changes": [
     {
       "id": "k1",
-      "desc": "Business areas 8 (2.0 slides) -> 10 (3.0)",
+      "desc": "Business areas 8 (2.0) -> 10 (3.0)",
       "key_terms": [
         "8",
         "10"
-      ]
-    },
-    {
-      "id": "k2",
-      "desc": "Business processes 78 (2.0 slides) -> 80 (3.0)",
-      "key_terms": [
-        "78",
-        "80"
       ]
     }
   ],
@@ -23,15 +15,13 @@
   "edits": {
     "sop_i1": {
       "must_contain": [
-        "10",
-        "80"
+        "10"
       ],
       "must_not_contain": [
-        "78",
         "8 MITA"
       ]
     }
   },
-  "notes": "Maturity levels stay 1-5 in both versions, so sop_i2 must NOT be flagged. Format mismatch: 2.0 is slides, 3.0 is prose, so the AI must cope with messy extracted text.",
-  "verified": "Old values read from the 2006 slides (business areas 8, processes 78). New values read directly from the 3.0 FM6 text (ten business areas, 80 business processes, five maturity levels). Key written before any AI run."
+  "verified": "2.0 FM6 page 5 (Figure I-4) says eight business areas. 3.0 FM6 page 9 says ten (10) business areas. Both documents describe five maturity levels, so sop_i2 must NOT be flagged. Key written before any AI run.",
+  "notes": "Both documents are the same-named FM6 introduction, same prose format. The 3.0 text also states 80 business processes; the 2.0 FM6 does not state a process count (78 appears in 2.0 Part I Chapter 4), so it is not used here."
 }
