@@ -17,4 +17,15 @@ for cid, expect in [("cert_01_checklist_deadlines", True), ("policy_01_prior_aut
     k = load_case(f"cases/{cid}")
     p = candidate_pairs(k["old"]["text"], k["new"]["text"])
     assert bool(p) == expect, (cid, p)
+# merged summary must stay small even when the model is verbose on every pair, and must keep the real finding
+from sectioned import make_sectioned_detector
+def verbose_model(o, n):
+    real = "eight" in o["text"].lower() and "ten (10)" in n["text"].lower()
+    filler = " The wording was reorganised and several sentences were rephrased to clarify the section. " * 6
+    return ("Business areas changed from eight to ten (10)." if real else "The text says must within 30 days instead of after 10 days.") + filler
+detect = make_sectioned_detector(verbose_model, verbose=False)
+merged = detect(c["old"], c["new"])
+print("merged summary chars:", len(merged))
+assert len(merged) <= 3500 + 10, "summary not capped"
+assert "eight to ten" in merged, "real finding lost"
 print("OK")

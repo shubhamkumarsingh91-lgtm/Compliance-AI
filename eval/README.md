@@ -152,6 +152,21 @@ Honest reading:
   (the maturity-scoring SOP).
 - **Whole-document comparison of the real MITA pair cannot run on this hardware** (out of memory in both runs).
 
+### Run 2, section-by-section mode: 5 of 10 passed
+
+On the nine short synthetic cases, section mode sees exactly the same text as whole-document mode (one chunk pair
+each, zero for the wording-only control), so it is the same pipeline with a different random draw. The two runs
+disagreed on four cases (cert_01 and policy_03 passed here and failed above; policy_04 failed here and passed
+above; policy_01 and others matched). **That disagreement on identical inputs is direct evidence that single runs
+are noisy.**
+
+The real MITA case **ran out of memory in section mode too** (tried to allocate 18 GiB). The 68 chunk
+comparisons are small (largest pair 412 words); the overflow came from merging up to 68 verbose model findings
+into one prompt for the impact step. Fixed in `sectioned.py`: a finding is kept only if it mentions a number or
+obligation word that really changed in that chunk pair, duplicates are dropped, and the merged summary is capped
+at about 900 tokens. `python3 test_sectioned.py` checks the cap and that the real 8-to-10 finding survives, using
+a simulated verbose model. This fix has not yet been run on the real model.
+
 ### Next
-Rerun with `REPEATS = 3` to get stable pass rates before changing any prompt again, to avoid tuning to noise.
-Then the section-by-section results for the real MITA case.
+1. Rerun with `REPEATS = 3` for stable pass rates on the synthetic cases (do not change prompts before this).
+2. Rerun the real MITA case in section mode with the capped summary.

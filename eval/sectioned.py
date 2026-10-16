@@ -94,17 +94,44 @@ def candidate_pairs(old_text, new_text, top_k=2, min_sim=0.05, focus=True, max_w
 NO_CHANGE = re.compile(r"\b(no (substantive|concrete|significant)? ?changes?|nothing (substantive )?changed|no changes)\b", re.I)
 
 
-def make_sectioned_detector(base_detect, focus=True, verbose=True):
-    """Wraps detect_changes(old_doc, new_doc) so it runs per matched chunk and merges the results."""
+def _focus_tokens(old, new):
+    """The numbers, number words and obligation words that actually differ between a chunk pair."""
+    return {t for t in _changed_tokens(old, new)
+            if any(c.isdigit() for c in t) or t in NUMBER_WORDS or t in OBLIGATION}
+
+
+def _grounded(finding, tokens):
+    """A finding only counts if it mentions at least one number/obligation word that really changed in that pair.
+    This drops chatter and hallucinated 'changes' from rewording-only pairs."""
+    words = set(_norm_words(finding))
+    hits = len(words & tokens)
+    return hits
+
+
+def make_sectioned_detector(base_detect, focus=True, verbose=True, max_chars=3500):
+    """Wraps detect_changes(old_doc, new_doc) so it runs per matched chunk and merges the results.
+
+    The merged summary is filtered (must mention a really-changed number/obligation word), de-duplicated and
+    capped at max_chars (about 900 tokens). Without the cap, 68 verbose findings produced an 18 GiB
+    out-of-memory error in the impact step."""
     def detect(old_doc, new_doc, **kw):
         pairs = candidate_pairs(old_doc["text"], new_doc["text"], focus=focus)
         if verbose: print(f"  sectioned: {len(pairs)} candidate chunk pair(s) to check")
-        findings = []
+        scored, seen = [], set()
         for oc, nc in pairs:
             o = dict(old_doc, text=oc or "(this section did not exist in the old version)")
             n = dict(new_doc, text=nc or "(this section was removed in the new version)")
             out = (base_detect(o, n) or "").strip()
-            if out and not NO_CHANGE.search(out[:120]):
-                findings.append(out)
-        return "\n".join(findings) if findings else "No substantive changes."
+            if not out or NO_CHANGE.search(out[:120]): continue
+            hits = _grounded(out, _focus_tokens(oc, nc))
+            key = " ".join(_norm_words(out))[:200]
+            if hits == 0 or key in seen: continue
+            seen.add(key); scored.append((hits, out))
+        scored.sort(key=lambda x: -x[0])                      # most grounded findings first
+        merged, size = [], 0
+        for hits, out in scored:
+            if size + len(out) > max_chars: continue
+            merged.append(out); size += len(out)
+        if verbose: print(f"  sectioned: kept {len(merged)} of {len(pairs)} findings ({size} chars)")
+        return "\n".join(merged) if merged else "No substantive changes."
     return detect
