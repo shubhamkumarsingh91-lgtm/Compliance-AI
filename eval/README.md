@@ -167,6 +167,25 @@ obligation word that really changed in that chunk pair, duplicates are dropped, 
 at about 900 tokens. `python3 test_sectioned.py` checks the cap and that the real 8-to-10 finding survives, using
 a simulated verbose model. This fix has not yet been run on the real model.
 
+### Run 3 - whole-document, 3 repeats each: 6/10 passed (stable)
+
+Change recall 1.0, impact recall 1.0, impact precision 0.889. Stable failures (same result in all 3 runs):
+**policy_05_requirement_removed_b 0/3** (a holdout: the removed requirement stays in the draft, so the v2 prompt
+fixed only the case it was tuned on) and **control_01_wording_only 0/3** (false alarm on a non-change).
+cert_01 is flaky (2/3, occasionally flags an unaffected SOP). The real MITA case ran out of memory, as expected.
+
+### Run 3 - section mode, 1 run each: 6/10 passed, no crash
+
+The capped summary fixed the out-of-memory error on the real case (it completed). But section mode failed
+policy_03, 04 and 05 with "no draft produced": on short documents there is no matching chunk for an added or
+removed sentence, or the grounding filter dropped the finding. **This corrects the Run 2 note above that section
+mode sees the same text as whole-document mode on short cases.** Fix: documents under about 1,500 words are now
+compared whole. On the real MITA case, 68 chunk pairs were checked, only 4 findings were kept, and the 8 to 10
+change was missed (sop_i2, the maturity-scoring SOP, was also wrongly flagged). Kept findings are now printed so
+we can see whether the model or the filter caused the miss.
+
+See `docs/LESSONS_LEARNED.md` for the full list of problems and fixes.
+
 ### Next
 1. Rerun with `REPEATS = 3` for stable pass rates on the synthetic cases (do not change prompts before this).
 2. Rerun the real MITA case in section mode with the capped summary.
