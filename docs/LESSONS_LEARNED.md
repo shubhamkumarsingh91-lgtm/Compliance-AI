@@ -44,6 +44,13 @@ This is a running log of what went wrong while building and testing this tool, w
 24. **Build a small real case plus synthetic cases.** Synthetic cases give clean answer keys. The real case shows whether the approach survives real document length and messy layout.
 25. **Market need is still unvalidated.** Code quality does not answer whether anyone would use this. Customer conversations come before more building.
 
+## F. Foundation lessons (Phases 0 to 2)
+
+26. **Plain RAG answered with the old version.** Asked for the prior-authorization threshold, the engine cited version 1 (12 visits) even though version 2 (20 visits) was retrieved. Retrieval finds relevant text; it does not know which version is current. This is the gap the rest of the project fills (version metadata, change detection).
+27. **A toy corpus hides problems.** Three short documents became three chunks, so chunking was never exercised, and `top_k=3` on three chunks returns everything, so retrieval quality was not really tested. Real long documents (Phase 7) were needed to find the real limits.
+28. **Check numbers written in notebook text.** The notebook said the model download was about 5 GB; it was 15.2 GB (the 5 GB is the 4-bit size in GPU memory).
+29. **Keep version information machine-readable.** Version labels that exist only in a free-text title cannot be used for filtering. Explicit metadata (family, version, effective date, current flag) was added in Phase 3.
+
 ## Open problems (as of the latest run)
 
 | Problem | Evidence | Next step |
