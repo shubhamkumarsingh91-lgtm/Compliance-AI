@@ -1,0 +1,1 @@
+At each patient visit, confirm insurance, collect the copay and update the contact sheet.

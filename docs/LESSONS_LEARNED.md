@@ -63,6 +63,13 @@ This is a running log of what went wrong while building and testing this tool, w
 36. **When one shared word decides a match, rank the matches.** Keeping only SOPs whose overlap is at least 60% of the best match removed most distractor flags without losing real ones.
 37. **Say what is uncertain instead of guessing.** Same numbers with different words inside a sentence cannot be classified by rules. They are now listed as "needs review", never auto-edited, instead of being treated as changes.
 
+## H. Turning the engine into an agent
+
+38. **A substring check can pass a broken draft.** The removal case "passed" while the draft read "mail a within 10 days", because the test only checked that "mail a paper copy" was gone. Running the real folder workflow exposed it. Fix: exact-text tests on whole drafts (`tests/test_agent.py`), and the removal notice now carries the words the earlier sentence lost.
+39. **Test the workflow, not just the engine.** Scanning a real folder found a report that was overwritten on rescan, a misleading "not edited" flag after an earlier edit had already fixed the number, and trailing newlines lost in edits. None showed up in the case scores.
+40. **Safety belongs in the design.** The agent writes suggestions to a separate folder, never edits originals, and applying a change needs a named approver, a backup and an audit line. A test checks that a scan leaves every input file byte-for-byte unchanged.
+41. **Library versions move.** The MCP package changed its server class name between major versions; the server tries both. Tests run the real server over stdio so a break is caught.
+
 ## Open problems (as of the latest run)
 
 | Problem | Evidence | Next step |

@@ -1,0 +1,2 @@
+Front desk staff verify the visit count against the 15-visit prior authorization threshold before scheduling.
+Escalate unclear cases to the billing lead.

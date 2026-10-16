@@ -1,0 +1,6 @@
+# Compliance agent (rule engine, scan, MCP server). No GPU needed.
+mcp>=1.12
+pypdf
+python-docx
+# Optional, only for the older language-model notebooks / sectioned.py:
+# scikit-learn

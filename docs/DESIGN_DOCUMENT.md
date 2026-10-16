@@ -290,6 +290,20 @@ The real MITA pair produces 68 candidate chunk pairs, and the real 8 to 10 pair 
 
 **Next.** A hybrid: rules decide everything checkable, and a language model of any size (hardware is no longer the limit) answers only narrow yes/no questions about uncertain pairs. More real document pairs and more fresh blind cases.
 
+### Phase 10 - Compliance agent and MCP connector
+
+**Goal.** Move from "an engine that passes test cases" to "an agent that scans documents and suggests changes", usable from any MCP-capable assistant.
+
+**Design.** `compliance_agent/` has four parts: `store.py` (reads txt, md, pdf, docx from folders and orders versions by date or version number; this is the one place new sources such as Drive, SharePoint or a git repo would plug in), `engine.py` (the rule engine), `scan.py` (compare each new version with the previous one, write the report, drafts, patches and audit log, skip pairs already done), and `mcp_server.py` (seven tools).
+
+**Safety rules built in.** A scan never edits a source file (tested byte for byte). Suggestions go to an output folder as diffs. `apply_draft` needs a named approver, keeps a backup and writes an audit line. Anything the rules cannot classify is listed as "needs a person" instead of being guessed.
+
+**Tested.** `tests/test_agent.py` runs the full folder workflow on `demo_workspace/`, checks exact draft text, rescans, approval and the audit log, and talks to the real MCP server over stdio.
+
+**Found by running it for real.** A removal edit that left "mail a" in the text, a report overwritten on rescan, and a misleading flag. Each is fixed and covered by a test.
+
+**Next.** Language-model check for the one failure type rules cannot handle (requirements worded with none of the SOP's words), more sources (Drive, SharePoint, git, web pages with change monitoring), a review screen, and real document pairs at larger scale.
+
 ## 7. Key design decisions and why
 
 | Decision | Why | Trade-off |

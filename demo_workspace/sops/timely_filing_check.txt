@@ -1,0 +1,1 @@
+Verify that each claim is submitted within 90 days of the date of service.

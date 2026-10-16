@@ -50,6 +50,9 @@ Full design document, phase by phase: [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCU
 ## Repo layout
 
 ```
+compliance_agent/  The agent: rule engine, folder scan, MCP server, CLI
+tests/       End-to-end agent tests (scan safety, exact drafts, approval, MCP over stdio)
+demo_workspace/  Sample policies and SOPs to try the agent on
 eval/        Test harness: 6 synthetic + 1 real (MITA 2.0 to 3.0) old/new policy cases with answer keys, scorer, real-document fetcher
 notebooks/   Kaggle notebooks, in run order (starter, phase 3 diff, phase 4 drafting)
 patches/     Paste-in cells: structured impact fix, stricter draft prompt + flagger
@@ -58,7 +61,32 @@ data/        compliance_results.json - output of a real run
 docs/        DESIGN_DOCUMENT.md (phases 0 to now), LESSONS_LEARNED.md, swim-lane diagram, overview PDF, setup guide
 ```
 
-## Run it
+## Compliance agent (runs anywhere, no GPU)
+
+`compliance_agent/` scans a folder of policy documents, compares each new version with the one before it, finds which SOPs
+are affected, and writes suggested updates as diffs with review flags. It never edits your files unless a named person
+approves a change.
+
+```
+pip install -r requirements.txt
+python3 -m compliance_agent scan demo_workspace/policies demo_workspace/sops --out out
+# open out/report.md   (drafts and .patch files are in out/drafts, every action is logged in out/audit.jsonl)
+python3 tests/test_agent.py        # end-to-end tests, including the MCP server
+```
+
+**Folder convention:** `policies/<policy_family>/<file with a date or v1, v2 in the name>` (txt, md, pdf, docx) and `sops/<one file per SOP>`.
+Re-running only compares versions it has not seen, and the report accumulates.
+
+**As an MCP connector** (use it from any MCP-capable assistant or tool):
+
+```json
+{"mcpServers": {"compliance-agent": {"command": "python3", "args": ["-m", "compliance_agent.mcp_server"], "cwd": "/path/to/compliance-ai"}}}
+```
+
+Tools: `compare_policy_text`, `compare_policy_files`, `list_policy_versions`, `suggest_sop_updates`, `scan_workspace`,
+`read_audit_log`, `apply_draft` (needs `approved_by`, keeps a backup, logs the approval).
+
+## Run the original notebooks
 
 1. On Kaggle: Create > New Notebook > File > Import Notebook
 2. Settings: Accelerator GPU T4 x2, Internet on (phone verification required)
