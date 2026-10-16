@@ -21,9 +21,13 @@ def real_pipeline(old_doc, new_doc, sops):
 _whole_doc_detect = detect_changes            # keep the original so we can restore it
 
 # The real case cannot run whole-document (out of memory, seen twice), so it only runs in section mode below.
-print("=== A) whole-document comparison ===")
-out_a = run_eval(real_pipeline, out_path=f"/kaggle/working/eval_results_whole_{RUN_LABEL}.json", repeats=REPEATS)
-print_report(out_a)
+SKIP_WHOLE = globals().get("SKIP_WHOLE", False)   # set SKIP_WHOLE = True to run only section mode (faster, lighter)
+if SKIP_WHOLE:
+    out_a = {"summary": "skipped"}
+else:
+    print("=== A) whole-document comparison ===")
+    out_a = run_eval(real_pipeline, out_path=f"/kaggle/working/eval_results_whole_{RUN_LABEL}.json", repeats=REPEATS)
+    print_report(out_a)
 
 print("\n=== B) section-by-section comparison ===")
 detect_changes = make_sectioned_detector(_whole_doc_detect)
