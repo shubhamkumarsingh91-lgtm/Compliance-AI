@@ -1,0 +1,9 @@
+{
+  "case_id": "blind_06_dollar_threshold",
+  "category": "policy",
+  "modeled_on": "dollar threshold",
+  "policy_family": "sample_blind_06_dollar_threshold",
+  "old_effective": "2023-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

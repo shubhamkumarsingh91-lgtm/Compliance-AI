@@ -1,0 +1,9 @@
+{
+  "case_id": "blind_07_added_no_shared_words",
+  "category": "policy",
+  "modeled_on": "added requirement, SOP uses different words (semantic match needed)",
+  "policy_family": "sample_blind_07_added_no_shared_words",
+  "old_effective": "2023-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

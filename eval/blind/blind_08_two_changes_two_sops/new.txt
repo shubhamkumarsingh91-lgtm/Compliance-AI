@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Reporting Policy (v2)
+
+Quarterly reports are due 30 days after quarter end. Providers must keep a signed copy of each report.

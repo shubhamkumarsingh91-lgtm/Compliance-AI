@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Record Keeping Policy (v1)
+
+Providers must retain records for 7 years. Providers must also notify the agency of any audit request.

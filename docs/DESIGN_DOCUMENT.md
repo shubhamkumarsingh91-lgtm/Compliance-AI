@@ -276,6 +276,18 @@ Design (in `eval/`):
 
 The real MITA pair produces 68 candidate chunk pairs, and the real 8 to 10 pair is among them (checked locally with a simulated model).
 
+### Phase 9 - Rule-based engine (decision: move checkable work out of the model)
+
+**Why.** Repeated runs showed the same weaknesses: false alarms on wording-only changes (0/3), removed requirements kept in drafts (0/3), real MITA change missed, and different answers on identical input. These are not hardware problems; they come from asking a language model to do exact work. Buying a bigger GPU would not make a model deterministic.
+
+**What.** `eval/engine.py`, no model and no GPU. It decides changes, affected SOPs and drafts by rules (details and limits in `eval/README.md`): sentence alignment with wording-only filtering, numbers and dates compared as facts, counted things compared across the whole document, removal notices, header and footer cleaning, copy-only (never invented) text for added requirements, and a VERIFY flag on every edit.
+
+**Result.** 10 of 10 development cases and 8 of 8 blind cases pass, identical across repeated runs, including the real MITA 8 to 10 change and the maturity-scoring SOP left alone.
+
+**How far to trust it.** The rules were tuned on the development cases. The blind cases found one real gap on the first run (month names) which was then fixed. Rules cannot judge meaning, so a requirement added in words the SOP never uses is missed. It has never seen a real SOP or a second real document pair. "No errors" is not a claim anyone can honestly make for any AI system; the design goal is that errors are rare, visible and caught by a person.
+
+**Next.** A hybrid: rules decide everything checkable, and a language model of any size (hardware is no longer the limit) answers only narrow yes/no questions about uncertain pairs. More real document pairs and more fresh blind cases.
+
 ## 7. Key design decisions and why
 
 | Decision | Why | Trade-off |
@@ -321,7 +333,9 @@ The real MITA pair produces 68 candidate chunk pairs, and the real 8 to 10 pair 
 - [x] GitHub packaging, disclaimer, swim-lane diagram, overview PDF
 - [x] Evaluation harness with answer keys, holdouts, repeats, one real case
 - [x] Section mode for long documents, size routing for short ones
-- [ ] Fix removal and false-alarm problems, re-run with repeats
+- [x] Rule-based engine fixes removal and false-alarm problems on all current cases (10/10 development, 8/8 blind)
+- [ ] Hybrid: add a narrow language-model yes/no check for uncertain pairs
+- [ ] Fresh blind cases and a second real document pair
 - [ ] Real MITA case passing in section mode
 - [ ] 20+ cases; more real old/new public document pairs
 - [ ] Customer conversations (agency staff, vendors, practitioners in other states)

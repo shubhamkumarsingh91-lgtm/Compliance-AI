@@ -1,0 +1,12 @@
+[
+  {
+    "id": "b7s1",
+    "title": "Pre-Procedure Checklist",
+    "text": "Before any procedure, check the photo ID of the patient at the bedside."
+  },
+  {
+    "id": "b7s2",
+    "title": "Vitals",
+    "text": "Record vital signs at each visit."
+  }
+]

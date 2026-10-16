@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Record Keeping Policy (v2)
+
+Providers must retain records for 7 years.

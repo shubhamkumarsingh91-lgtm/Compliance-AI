@@ -1,0 +1,14 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "6 -> 8 years",
+      "key_terms": [
+        "6",
+        "8"
+      ]
+    }
+  ],
+  "affected": [],
+  "edits": {}
+}

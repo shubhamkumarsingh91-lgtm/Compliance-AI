@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Telehealth Rate Policy (v1)
+
+Audio-only visits are reimbursed at 80% of the standard rate.

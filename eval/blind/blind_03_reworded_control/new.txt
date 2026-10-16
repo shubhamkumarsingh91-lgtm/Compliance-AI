@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Discharge Filing Policy (v2)
+
+Facilities must submit claims no later than 30 days after discharge.

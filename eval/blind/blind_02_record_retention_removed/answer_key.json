@@ -1,0 +1,24 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "audit notification removed",
+      "key_terms": [
+        "audit"
+      ]
+    }
+  ],
+  "affected": [
+    "b2s1"
+  ],
+  "edits": {
+    "b2s1": {
+      "must_contain": [
+        "7 years"
+      ],
+      "must_not_contain": [
+        "notify the agency"
+      ]
+    }
+  }
+}

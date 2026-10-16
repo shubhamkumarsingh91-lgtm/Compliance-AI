@@ -1,0 +1,12 @@
+[
+  {
+    "id": "b1s1",
+    "title": "Audio Visit Billing",
+    "text": "Bill audio-only visits at 80% of the standard rate and note the modality on the claim."
+  },
+  {
+    "id": "b1s2",
+    "title": "Prior Auth Desk",
+    "text": "Track prior authorization requests in the shared log each morning."
+  }
+]

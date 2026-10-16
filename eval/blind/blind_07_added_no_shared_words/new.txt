@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Patient Safety Policy (v2)
+
+Facilities must record vital signs at each visit. Facilities shall verify patient identity before any procedure.

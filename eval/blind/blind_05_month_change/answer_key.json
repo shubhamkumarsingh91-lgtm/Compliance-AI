@@ -1,0 +1,25 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "January -> October",
+      "key_terms": [
+        "january",
+        "october"
+      ]
+    }
+  ],
+  "affected": [
+    "b5s1"
+  ],
+  "edits": {
+    "b5s1": {
+      "must_contain": [
+        "October"
+      ],
+      "must_not_contain": [
+        "January"
+      ]
+    }
+  }
+}

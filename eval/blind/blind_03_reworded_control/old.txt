@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Discharge Filing Policy (v1)
+
+Claims are due within 30 days of discharge.

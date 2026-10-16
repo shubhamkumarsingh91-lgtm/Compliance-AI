@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Patient Safety Policy (v1)
+
+Facilities must record vital signs at each visit.

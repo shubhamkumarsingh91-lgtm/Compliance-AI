@@ -42,7 +42,7 @@ Change tested: prior-authorization threshold raised from 15 to 20 visits.
 
 Full design document, phase by phase: [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md). A full log of what went wrong and what I changed is in [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md).
 
-- Evaluated on 9 synthetic cases and 1 real public pair (MITA 2.0 to 3.0). Latest repeated run: 6 of 10 cases passed. The tool finds changes reliably (recall 1.0) but over-flags unaffected SOPs and does not reliably delete removed requirements. Details in eval/README.md.
+- Evaluated on 9 synthetic cases and 1 real public pair (MITA 2.0 to 3.0). Language-model version, latest repeated run: 6 of 10 passed (recall 1.0, but false alarms and removed requirements kept). New rule-based engine (`eval/engine.py`, no GPU, same answer every run): 10 of 10 development and 8 of 8 blind cases, with honest caveats on how much that proves. Details in eval/README.md.
 - Not tested on real versioned CMS or state documents.
 - Market need is **unvalidated**: a first practitioner conversation suggested the current
   manual process may already be good enough. Customer interviews come before more building.

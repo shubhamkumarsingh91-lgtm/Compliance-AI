@@ -1,0 +1,9 @@
+{
+  "case_id": "blind_03_reworded_control",
+  "category": "control",
+  "modeled_on": "same rule, different words, new subject added",
+  "policy_family": "sample_blind_03_reworded_control",
+  "old_effective": "2023-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

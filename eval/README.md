@@ -95,6 +95,30 @@ not proof. In 2.0 the "eight business areas" evidence is a figure caption, while
 match was needed to connect them, which costs more model calls (about 68). Pairs the filter drops can never be
 reported, so a real change that looks like pure rewording can be missed.
 
+## Rule-based engine (`engine.py`) - no GPU, no language model
+
+The language model version made errors a program does not make: false alarms on wording-only changes, removed
+requirements left in drafts, and different answers on identical input. So the facts that code can check are now decided
+by rules, with the same answer every time:
+
+| Job | How the engine does it |
+|---|---|
+| Find changes | Align sentences old to new. Same numbers + same meaning words = wording-only, ignored. Numbers or dates swapped = value change. A sentence with no match = added or removed. "No longer required" = removal notice. Counted things ("eight business areas" to "ten") are compared across the whole document, which catches changes buried in captions. |
+| Ignore noise | Running headers and footers, figure/table/page numbers, descriptive prose, examples, glued-together bullet text. |
+| Map to SOPs | A value change flags an SOP only if it states the old value AND shares words with the changed sentence. Added or removed requirements need a rare shared word. |
+| Draft | Swap the number or date. Cut the clause the policy dropped. For an added requirement, copy the policy sentence word for word (never invented) and flag it. Every edit carries a VERIFY flag. |
+
+Run it: `python3 run_engine_eval.py` (seconds, no GPU). Latest: **10 of 10 development cases and 8 of 8 blind cases pass, identical
+across repeated runs.**
+
+**How much to trust that number (read this).**
+- The rules were tuned while looking at the 10 development cases, including the real MITA pair and the holdouts, so 10/10 there proves little.
+- The 8 blind cases were written afterwards with varied phrasing. The first run failed one (a month change, January to October) which exposed a real gap; I fixed it, so the blind set is now also partly used up. Fresh cases are needed for an unbiased number.
+- One blind case passed by luck: an added requirement whose SOP used different words (identity check vs photo ID) was matched only because both mentioned "patient". Rules cannot judge meaning.
+- Known limits: a heavily reworded sentence can look like a change; a requirement added in words the SOP never uses is missed; long glued-together PDF passages are reported but not mapped; the engine has never seen a real SOP.
+
+The planned hybrid: rules decide everything checkable, and a language model (any size, since hardware is no longer the limit) is asked only narrow yes/no questions about uncertain pairs, such as "does this added requirement apply to this SOP?", with its answer logged for review.
+
 ## Results log (real runs on Qwen2.5-7B-Instruct 4-bit, Kaggle T4 x2)
 
 Numbers here come from actual runs, not estimates.

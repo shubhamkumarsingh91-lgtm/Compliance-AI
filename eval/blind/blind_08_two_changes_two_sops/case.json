@@ -1,0 +1,9 @@
+{
+  "case_id": "blind_08_two_changes_two_sops",
+  "category": "certification",
+  "modeled_on": "b8s2 mentions an unchanged requirement and must not be flagged",
+  "policy_family": "sample_blind_08_two_changes_two_sops",
+  "old_effective": "2023-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}

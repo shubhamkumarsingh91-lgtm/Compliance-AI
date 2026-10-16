@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Enrollment Window Policy (v1)
+
+The open enrollment period begins in January and members must be notified 30 days before it begins.

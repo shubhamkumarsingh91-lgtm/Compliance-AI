@@ -51,6 +51,14 @@ This is a running log of what went wrong while building and testing this tool, w
 28. **Check numbers written in notebook text.** The notebook said the model download was about 5 GB; it was 15.2 GB (the 5 GB is the 4-bit size in GPU memory).
 29. **Keep version information machine-readable.** Version labels that exist only in a free-text title cannot be used for filtering. Explicit metadata (family, version, effective date, current flag) was added in Phase 3.
 
+## G. Moving checkable work from the model to code
+
+30. **Do not ask a language model to do what code can do exactly.** Comparing numbers, dates and counts, and swapping a value in a sentence, is deterministic. The rule-based engine does it identically every run, which removed the false alarm on wording-only changes and the noise between runs.
+31. **PDF text is dirty.** Running headers, figure and page numbers, and bullets glued into one long "sentence" create fake changes. Cleaning (drop repeated lines, ignore figure/table/page numbers, skip long passages) mattered more than any model setting.
+32. **A caption can hide the change.** In the real MITA pair the old version only had "Figure I-4. The Eight Business Areas" while the new one had a sentence "ten (10) business areas". Sentence matching cannot pair those. Comparing counted things across the whole document found it.
+33. **A perfect score on cases you tuned on means little.** 10/10 on the development cases came after tuning on them. Fresh blind cases found a real gap (month names) on the first run; fixing it uses up those cases too. Keep making new ones.
+34. **Rules cannot judge meaning.** A new requirement worded differently from the SOP is missed, and one shared common word can cause a wrong match or a lucky right one. This is the narrow place a language model still belongs.
+
 ## Open problems (as of the latest run)
 
 | Problem | Evidence | Next step |

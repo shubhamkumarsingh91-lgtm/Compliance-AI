@@ -1,0 +1,25 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "$500 -> $750",
+      "key_terms": [
+        "500",
+        "750"
+      ]
+    }
+  ],
+  "affected": [
+    "b6s1"
+  ],
+  "edits": {
+    "b6s1": {
+      "must_contain": [
+        "750"
+      ],
+      "must_not_contain": [
+        "500"
+      ]
+    }
+  }
+}

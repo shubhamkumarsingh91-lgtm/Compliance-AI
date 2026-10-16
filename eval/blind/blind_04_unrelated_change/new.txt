@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Equipment Policy (v2)
+
+Providers must replace infusion pumps every 8 years.

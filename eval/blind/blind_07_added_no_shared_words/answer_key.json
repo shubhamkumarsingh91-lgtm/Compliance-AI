@@ -1,0 +1,22 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "identity verification added",
+      "key_terms": [
+        "verify patient identity"
+      ]
+    }
+  ],
+  "affected": [
+    "b7s1"
+  ],
+  "edits": {
+    "b7s1": {
+      "must_contain": [
+        "identity"
+      ],
+      "must_not_contain": []
+    }
+  }
+}

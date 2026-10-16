@@ -1,0 +1,5 @@
+SYNTHETIC EXAMPLE - written for testing, not real policy text.
+
+Sample Equipment Purchase Policy (v1)
+
+Purchases above $500 require written approval from the director.

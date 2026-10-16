@@ -1,0 +1,25 @@
+{
+  "changes": [
+    {
+      "id": "k1",
+      "desc": "80% -> 85%",
+      "key_terms": [
+        "80",
+        "85"
+      ]
+    }
+  ],
+  "affected": [
+    "b1s1"
+  ],
+  "edits": {
+    "b1s1": {
+      "must_contain": [
+        "85%"
+      ],
+      "must_not_contain": [
+        "80%"
+      ]
+    }
+  }
+}

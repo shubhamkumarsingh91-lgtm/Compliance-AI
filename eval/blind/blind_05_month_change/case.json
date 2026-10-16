@@ -1,0 +1,9 @@
+{
+  "case_id": "blind_05_month_change",
+  "category": "certification",
+  "modeled_on": "month name change",
+  "policy_family": "sample_blind_05_month_change",
+  "old_effective": "2023-01-01",
+  "new_effective": "2026-01-01",
+  "data": "synthetic"
+}
