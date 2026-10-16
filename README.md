@@ -40,7 +40,7 @@ Change tested: prior-authorization threshold raised from 15 to 20 visits.
 
 ## Honest status
 
-A full log of what went wrong and what I changed is in [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md).
+Full design document, phase by phase: [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md). A full log of what went wrong and what I changed is in [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md).
 
 - Evaluated on 9 synthetic cases and 1 real public pair (MITA 2.0 to 3.0). Latest repeated run: 6 of 10 cases passed. The tool finds changes reliably (recall 1.0) but over-flags unaffected SOPs and does not reliably delete removed requirements. Details in eval/README.md.
 - Not tested on real versioned CMS or state documents.
@@ -55,7 +55,7 @@ notebooks/   Kaggle notebooks, in run order (starter, phase 3 diff, phase 4 draf
 patches/     Paste-in cells: structured impact fix, stricter draft prompt + flagger
 demo/        compliance_demo.html (redline view), compliance_dashboard.html - open in a browser
 data/        compliance_results.json - output of a real run
-docs/        Swim-lane diagram, project overview PDF, setup guide, LESSONS_LEARNED.md
+docs/        DESIGN_DOCUMENT.md (phases 0 to now), LESSONS_LEARNED.md, swim-lane diagram, overview PDF, setup guide
 ```
 
 ## Run it
