@@ -119,6 +119,25 @@ across repeated runs.**
 
 The planned hybrid: rules decide everything checkable, and a language model (any size, since hardware is no longer the limit) is asked only narrow yes/no questions about uncertain pairs, such as "does this added requirement apply to this SOP?", with its answer logged for review.
 
+## Scale test: thousands of generated cases (`generate_cases.py`)
+
+`python3 generate_cases.py 1000 7` builds 1,000 labeled old/new policy cases in seconds (number, date, added requirement,
+removed requirement, silent deletion, pure rewording, change with no matching SOP, two changes at once), each with
+distractor SOPs and an exact answer key, and scores the rule engine on them. Different seeds give different cases.
+
+| Seeds tried | Cases | Passed |
+|---|---|---|
+| 7, 11, 23, 101 | 4,000 | 97.6% to 98.3% per seed |
+
+By type: number, date, removal, silent deletion, wording-only, unrelated change, and two-changes-at-once all pass. The
+only failures are **an added requirement whose SOP shares no words with it** (for example "verify patient identity" vs
+"check the photo ID"). Rules cannot connect those; that is the job of the language-model check in the hybrid design.
+
+What this proves and what it does not: the first 1,000-case run found real bugs (false alarms on paraphrases, distractor
+SOPs flagged by one common word, two changes colliding on the same number), and the engine was fixed against them. The
+generator is my templates, so the later seeds are not independent proof. They show robustness on this family of changes.
+Accuracy on real policy writing needs real old/new document pairs with human-checked answers.
+
 ## Results log (real runs on Qwen2.5-7B-Instruct 4-bit, Kaggle T4 x2)
 
 Numbers here come from actual runs, not estimates.

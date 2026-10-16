@@ -116,10 +116,9 @@ def diff_policy(old_text, new_text, match_min=0.30):
             changes.append(dict(kind="value_change", old=olds[bi], new=ns, old_values=rem, new_values=add,
                                 stems=dropped | gained, ctx=ostem[bi] | nstem[j]))
         elif sorted(on) == sorted(nn) and (len(dropped) >= 2 or len(gained) >= 2):
-            if len(dropped) >= len(gained):
-                changes.append(dict(kind="removed", old=olds[bi], new=ns, stems=dropped))
-            else:
-                changes.append(dict(kind="added_in_sentence", old=olds[bi], new=ns, stems=gained))
+            # Same numbers, different words inside a matched sentence: could be a reworded rule or a real extra clause.
+            # Code cannot tell, so it is listed for a person (or a later language-model check), not auto-applied.
+            changes.append(dict(kind="uncertain", old=olds[bi], new=ns, stems=dropped | gained))
         # else: wording-only, ignored on purpose
     for i, os_ in enumerate(olds):
         if i in used_old: continue
@@ -128,6 +127,9 @@ def diff_policy(old_text, new_text, match_min=0.30):
     # Only requirement sentences create SOP work; descriptive prose that appears or disappears is ignored.
     keep = []
     for c in changes:
+        if c["kind"] == "uncertain":
+            if OBLIG.search(c["new"]): keep.append(c)
+            continue
         if c["kind"] in ("added", "added_in_sentence"):
             if not OBLIG.search(c["new"]): continue
         elif c["kind"] == "removed":
@@ -171,12 +173,17 @@ def quantity_changes(old_text, new_text):
     return out
 
 
+GENERIC_VERBS = {_stem(w) for w in """record log keep send submit check complete maintain ensure provide review update track
+notify mail give get make use need follow include prepare""".split()}
+
+
 def _rare_terms(stems, sops):
     """Terms that appear in fewer than half of the SOPs (so shared common words do not cause false flags)."""
     sop_stems = [content_stems(s["text"]) for s in sops]
     n = len(sops)
     keep = set()
     for t in stems:
+        if t in GENERIC_VERBS: continue
         df = sum(1 for ss in sop_stems if t in ss)
         if df and (n == 1 or df <= n / 2):
             keep.add(t)
@@ -199,36 +206,52 @@ MAX_RULE_WORDS = 45
 
 
 def is_long_passage(ch):
+    if ch["kind"] == "uncertain": return True       # never mapped to SOPs automatically
     """Glued-together bullets and headings (common in PDF text) are too messy to map to an SOP by rule."""
     return ch["kind"] in ("added", "removed", "added_in_sentence", "removal_notice") and \
         len((ch.get("new") or ch.get("old") or "").split()) > MAX_RULE_WORDS
 
 
 def affected_sops(changes, sops):
-    """Maps each change to the SOPs it touches. Returns {sop_id: [reasons]}."""
+    """Maps each change to the SOPs it touches. Returns {sop_id: [(change, reason)]}."""
     out = {}
     for ch in changes:
         if is_long_passage(ch): continue
         if re.match(r"\s*(for example|e\.g\.|for instance)", (ch.get("new") or ch.get("old") or ""), re.I): continue
+        term_hits = {}                                   # SOPs matched only by shared words, with how many
         for s in sops:
-            low = s["text"].lower()
             toks = set(t.lower() for t in _tokens(s["text"]))
-            why = None
             if ch["kind"] == "quantity_change":
                 near = _near_number(s["text"], ch["old_values"], ch["key"])
-                if near: why = f"states {near} next to '{' '.join(ch['key'])}'"
+                if near:
+                    out.setdefault(s["id"], []).append((ch, f"states {near} next to '{' '.join(ch['key'])}'"))
             elif ch["kind"] == "value_change":
                 has_val = any(v in toks for v in ch["old_values"])
                 shared_ctx = ch["ctx"] & content_stems(s["text"] + " " + s.get("title", ""))
                 if has_val and shared_ctx:
-                    why = f"states old value {ch['old_values']} and shares terms {sorted(shared_ctx)}"
-            if why is None and ch["kind"] != "quantity_change":
+                    out.setdefault(s["id"], []).append(
+                        (ch, f"states old value {ch['old_values']} and shares terms {sorted(shared_ctx)}"))
+            else:
                 shared = _rare_terms(ch["stems"], sops) & content_stems(s["text"])
-                if len(shared) >= 1 and ch["kind"] != "value_change":
-                    why = f"shares terms {sorted(shared)} with a {ch['kind'].replace('_', ' ')}"
-            if why:
-                out.setdefault(s["id"], []).append((ch, why))
-    return out
+                if shared: term_hits[s["id"]] = shared
+        if term_hits:                                     # keep the best matches only (at least 60% of the top overlap)
+            top = max(len(v) for v in term_hits.values())
+            for sid, shared in term_hits.items():
+                if len(shared) >= 0.6 * top:
+                    out.setdefault(sid, []).append(
+                        (ch, f"shares terms {sorted(shared)} with a {ch['kind'].replace('_', ' ')}"))
+    # A number in an SOP belongs to the changed sentence it shares the most words with.
+    for sid, items in out.items():
+        sop_text = next(x["text"] for x in sops if x["id"] == sid)
+        best = {}
+        for ch, why in items:
+            if ch["kind"] != "value_change": continue
+            sc = len(ch["ctx"] & content_stems(sop_text))
+            for v in ch["old_values"]:
+                if sc > best.get(v, (-1, None))[0]: best[v] = (sc, ch)
+        out[sid] = [(ch, why) for ch, why in items
+                    if ch["kind"] != "value_change" or any(best[v][1] is ch for v in ch["old_values"] if v in best)]
+    return {k: v for k, v in out.items() if v}
 
 
 def _replace_values(text, old_vals, new_vals):
@@ -309,5 +332,7 @@ def run_engine(old_doc, new_doc, sops):
         tag = "long_passage_changed_review_manually" if is_long_passage(c) else c["kind"]
         return f"[{tag}] " + (c.get("new") or c.get("old", ""))[:200]
     summary = "No substantive changes." if not changes else "\n".join(line(c) for c in changes)
+    uncertain = [c for c in changes if c["kind"] == "uncertain"]
     return dict(changes_summary=summary, impact_analysis=mapped and {k: [w for _, w in v] for k, v in mapped.items()},
-                impact_parse_method="rules", affected_sop_ids=list(mapped), drafted_updates=drafts)
+                impact_parse_method="rules", affected_sop_ids=list(mapped), drafted_updates=drafts,
+                needs_review=[dict(old=c["old"], new=c["new"]) for c in uncertain])

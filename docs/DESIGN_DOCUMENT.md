@@ -284,6 +284,8 @@ The real MITA pair produces 68 candidate chunk pairs, and the real 8 to 10 pair 
 
 **Result.** 10 of 10 development cases and 8 of 8 blind cases pass, identical across repeated runs, including the real MITA 8 to 10 change and the maturity-scoring SOP left alone.
 
+**Scale test.** A generator (`eval/generate_cases.py`) builds labeled cases with exact answers; 4,000 cases across four seeds pass at 97.6 to 98.3%. All failures are one category: an added requirement whose SOP shares no words with it, which needs a language-model check.
+
 **How far to trust it.** The rules were tuned on the development cases. The blind cases found one real gap on the first run (month names) which was then fixed. Rules cannot judge meaning, so a requirement added in words the SOP never uses is missed. It has never seen a real SOP or a second real document pair. "No errors" is not a claim anyone can honestly make for any AI system; the design goal is that errors are rare, visible and caught by a person.
 
 **Next.** A hybrid: rules decide everything checkable, and a language model of any size (hardware is no longer the limit) answers only narrow yes/no questions about uncertain pairs. More real document pairs and more fresh blind cases.

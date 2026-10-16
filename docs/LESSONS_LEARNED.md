@@ -59,6 +59,10 @@ This is a running log of what went wrong while building and testing this tool, w
 33. **A perfect score on cases you tuned on means little.** 10/10 on the development cases came after tuning on them. Fresh blind cases found a real gap (month names) on the first run; fixing it uses up those cases too. Keep making new ones.
 34. **Rules cannot judge meaning.** A new requirement worded differently from the SOP is missed, and one shared common word can cause a wrong match or a lucky right one. This is the narrow place a language model still belongs.
 
+35. **Generate test cases at scale.** A generator with known edits made 1,000 labeled cases in seconds and found bugs 10 hand-written cases never would: paraphrases flagged as changes, distractor SOPs matched by one common word ("waiting", "record"), and two number changes colliding on the same SOP number.
+36. **When one shared word decides a match, rank the matches.** Keeping only SOPs whose overlap is at least 60% of the best match removed most distractor flags without losing real ones.
+37. **Say what is uncertain instead of guessing.** Same numbers with different words inside a sentence cannot be classified by rules. They are now listed as "needs review", never auto-edited, instead of being treated as changes.
+
 ## Open problems (as of the latest run)
 
 | Problem | Evidence | Next step |
