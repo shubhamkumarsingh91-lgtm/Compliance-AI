@@ -74,22 +74,37 @@ def score_case(case, result):
                 flagged_new_clauses=invented)
 
 
-def run_eval(pipeline, cases_dir=CASES_DIR, out_path=None):
-    rows = []
+def _run_once(pipeline, case):
+    try:
+        result = pipeline(case["old"], case["new"], case["sops"])
+        row = score_case(case, result)
+        row["draft_texts"] = {x["sop_id"]: x["draft_text"] for x in result.get("drafted_updates", [])}
+        row["changes_summary"] = result.get("changes_summary", "")
+    except Exception as e:  # a crash is a failed case, not a stopped run
+        try:  # free GPU memory so one out-of-memory case does not break the next
+            import gc, torch; gc.collect(); torch.cuda.empty_cache()
+        except Exception:
+            pass
+        row = dict(case_id=case["meta"]["case_id"], category=case["meta"]["category"], passed=False, error=repr(e))
+    return row
+
+
+def run_eval(pipeline, cases_dir=CASES_DIR, out_path=None, repeats=1, real_repeats=1):
+    """repeats > 1 runs each synthetic case several times, because the model samples its output and a
+    single run can pass or fail by luck. Cases whose id starts with 'real_' use real_repeats (they are slow)."""
+    rows, stability = [], []
     for d in sorted(pathlib.Path(cases_dir).iterdir()):
         if not (d / "case.json").exists(): continue
         case = load_case(d)
-        try:
-            result = pipeline(case["old"], case["new"], case["sops"])
-            row = score_case(case, result)
-            row["draft_texts"] = {x["sop_id"]: x["draft_text"] for x in result.get("drafted_updates", [])}
-            row["changes_summary"] = result.get("changes_summary", "")
-        except Exception as e:  # a crash is a failed case, not a stopped run
-            try:  # free GPU memory so one out-of-memory case does not break the next
-                import gc, torch; gc.collect(); torch.cuda.empty_cache()
-            except Exception:
-                pass
-            row = dict(case_id=case["meta"]["case_id"], category=case["meta"]["category"], passed=False, error=repr(e))
+        n = real_repeats if case["meta"]["case_id"].startswith("real_") else repeats
+        runs = [_run_once(pipeline, case) for _ in range(n)]
+        row = dict(runs[0]); row["runs"] = n; row["passes"] = sum(r["passed"] for r in runs)
+        if n > 1:
+            row["passed"] = row["passes"] == n
+            row["failure_messages_seen"] = sorted({m for r in runs for k in ("edit_failures",) for m in r.get(k, [])}
+                                                  | {f"wrongly flagged {x}" for r in runs for x in r.get("wrongly_flagged", [])}
+                                                  | {f"not flagged {x}" for r in runs for x in r.get("not_flagged", [])}
+                                                  | {r["error"] for r in runs if "error" in r})
         rows.append(row)
     n = len(rows); ok = [r for r in rows if "error" not in r]
     avg = lambda k: round(sum(r[k] for r in ok) / len(ok), 3) if ok else 0
@@ -98,6 +113,12 @@ def run_eval(pipeline, cases_dir=CASES_DIR, out_path=None):
                    avg_impact_recall=avg("impact_recall"),
                    total_flagged_new_clauses=sum(r.get("flagged_new_clauses", 0) for r in ok),
                    errors=n - len(ok))
+    if repeats > 1:
+        tot_runs = sum(r["runs"] for r in rows)
+        summary.update(repeats=repeats, avg_pass_rate=round(sum(r["passes"] for r in rows) / tot_runs, 3),
+                       always_pass=sum(r["passes"] == r["runs"] for r in rows),
+                       never_pass=sum(r["passes"] == 0 for r in rows),
+                       flaky=sum(0 < r["passes"] < r["runs"] for r in rows))
     out = dict(summary=summary, cases=rows)
     if out_path: pathlib.Path(out_path).write_text(json.dumps(out, indent=2))
     return out
@@ -108,8 +129,14 @@ def print_report(out):
     print(f"\nPASSED {s['passed']}/{s['cases']} cases | change recall {s['avg_change_recall']} | "
           f"impact precision {s['avg_impact_precision']} | impact recall {s['avg_impact_recall']} | "
           f"flagged new clauses {s['total_flagged_new_clauses']} | errors {s['errors']}\n")
+    if "avg_pass_rate" in s:
+        print(f"STABILITY over {s['repeats']} runs: average pass rate {s['avg_pass_rate']} | "
+              f"always pass {s['always_pass']} | flaky {s['flaky']} | never pass {s['never_pass']}\n")
     for r in out["cases"]:
-        print(("PASS " if r["passed"] else "FAIL ") + f"{r['case_id']} [{r['category']}]")
+        tag = "PASS " if r["passed"] else ("FLAKY" if r.get("passes", 0) > 0 and r.get("runs", 1) > 1 else "FAIL ")
+        runs = f" ({r['passes']}/{r['runs']} runs)" if r.get("runs", 1) > 1 else ""
+        print(f"{tag} {r['case_id']} [{r['category']}]{runs}")
+        for m in r.get("failure_messages_seen", []): print("   seen:", m)
         if "error" in r: print("   error:", r["error"]); continue
         for k in ("missed_changes", "wrongly_flagged", "not_flagged", "edit_failures", "drafts_for_unaffected"):
             if r[k]: print(f"   {k}: {r[k]}")

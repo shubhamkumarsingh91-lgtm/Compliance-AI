@@ -123,7 +123,35 @@ What this means:
 - The section-by-section run (68 chunk pairs on the real case) had not finished when results were shared, so
   there is no score for it yet.
 
-### Run 2 - planned
-Prompt fix v2 plus three **holdout** cases (`policy_04`, `policy_05`, `cert_02`), written after run 1 and before
-run 2 without looking at model output, so the fix is not only tuned to the cases it was designed from. Results
-will be added here.
+### Run 2 - prompt fix v2, whole-document comparison, 10 cases (one run each): 4 passed, 6 failed
+
+| Case | Run 1 | Run 2 | Run 2 failure |
+|---|---|---|---|
+| cert_01_checklist_deadlines | pass | FAIL | program-integrity SOP (new EVV criterion) not flagged |
+| mita_01_self_assessment_window | pass | FAIL | maturity-scoring SOP wrongly flagged and redrafted |
+| policy_01_prior_auth_threshold | pass | pass | |
+| policy_02_new_requirement_added | FAIL | FAIL | SOP not flagged |
+| policy_03_requirement_removed | FAIL | FAIL | removed requirement still in draft |
+| control_01_wording_only | pass | pass | |
+| policy_04_new_requirement_b (holdout) | - | pass | |
+| policy_05_requirement_removed_b (holdout) | - | FAIL | removed requirement still in draft |
+| cert_02_mixed_changes (holdout) | - | pass | |
+| real_mita_intro_2_0_to_3_0 | FAIL | FAIL | out of memory again (tried to allocate 26 GiB) |
+
+Averages: change recall 1.0, impact precision 0.85, impact recall 0.85, 9 invented clauses flagged.
+
+Honest reading:
+- **The v2 prompts did not clearly help.** On the original six cases, run 1 passed 4 and run 2 passed 2. Two cases
+  that passed before now fail. Holdouts passed 2 of 3 (the new-requirement and mixed cases passed; the removal case
+  still left the removed text in the draft).
+- **One run per prompt is too noisy to conclude much.** The model samples its output, so the same case can pass
+  or fail by luck. A change of two cases between runs could be noise. The scorer now supports repeated runs
+  (`REPEATS`, default 3) and reports pass rate and "flaky" cases, so prompts can be compared fairly.
+- **Likely real problems, to confirm with repeats:** removed requirements are not reliably deleted from drafts
+  (3 failures across two prompt versions), and the v2 impact wording may over-flag related-but-unaffected SOPs
+  (the maturity-scoring SOP).
+- **Whole-document comparison of the real MITA pair cannot run on this hardware** (out of memory in both runs).
+
+### Next
+Rerun with `REPEATS = 3` to get stable pass rates before changing any prompt again, to avoid tuning to noise.
+Then the section-by-section results for the real MITA case.
