@@ -304,6 +304,10 @@ The real MITA pair produces 68 candidate chunk pairs, and the real 8 to 10 pair 
 
 **Next.** Language-model check for the one failure type rules cannot handle (requirements worded with none of the SOP's words), more sources (Drive, SharePoint, git, web pages with change monitoring), a review screen, and real document pairs at larger scale.
 
+### Phase 11 - Language-model check (judge)
+
+Rules decide what can be checked exactly; a judge handles meaning, in three narrow yes/no questions (requirement applies to an SOP with no shared words, weak one-word link real or not, reworded sentence same requirement or not). It never writes text, "unsure" changes nothing, and every answer is cached and logged. Backends: local open model (`hf`), hosted model (`api`), or none. Tested with fake judges for plumbing and safety; the real model's accuracy is measured by `eval/kaggle_run_judge.py` (rules only versus rules plus judge, per case type). Not yet measured.
+
 ## 7. Key design decisions and why
 
 | Decision | Why | Trade-off |

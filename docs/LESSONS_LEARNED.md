@@ -70,6 +70,10 @@ This is a running log of what went wrong while building and testing this tool, w
 40. **Safety belongs in the design.** The agent writes suggestions to a separate folder, never edits originals, and applying a change needs a named approver, a backup and an audit line. A test checks that a scan leaves every input file byte-for-byte unchanged.
 41. **Library versions move.** The MCP package changed its server class name between major versions; the server tries both. Tests run the real server over stdio so a break is caught.
 
+42. **Give the model the narrowest possible job.** The judge answers one yes/no question with a reason and cannot write text. That bounds how much damage a wrong answer can do, and makes its errors countable.
+43. **Test the safety rules, not just the happy path.** The tests prove an always-"no" or always-"unsure" judge cannot remove a correct rule-based match, that unreadable output becomes "unsure", and that a call limit and cache hold.
+44. **A perfect score with a fake oracle only proves the wiring.** 1000/1000 with an oracle judge says nothing about a real model. The real number comes from `eval/kaggle_run_judge.py`.
+
 ## Open problems (as of the latest run)
 
 | Problem | Evidence | Next step |

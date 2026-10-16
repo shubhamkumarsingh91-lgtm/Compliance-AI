@@ -146,12 +146,25 @@ def make(i, rng):
                 old=mk(old, 1), new=mk(new, 2), sops=sops, key=key)
 
 
-def run(n=1000, seed=7, show=8):
+def oracle_judge_for(case):
+    """A judge that knows the answer key. Used only to test that the judge plumbing works (not a model)."""
+    from compliance_agent.judge import FakeJudge
+    truth = {s["text"] for s in case["sops"] if s["id"] in case["key"]["affected"]}
+    reword = case["meta"]["category"].startswith("reword")
+    def rule(kind, a, b):
+        if kind == "same_requirement": return "yes" if reword else "no"
+        return "yes" if b in truth else "no"
+    return FakeJudge(rule)
+
+
+def run(n=1000, seed=7, show=8, judge_factory=None, kinds=None):
+    """judge_factory(case) -> judge or None. kinds: only run these case types (e.g. {'added', 'reword'})."""
     rng = random.Random(seed)
     by = collections.defaultdict(lambda: [0, 0]); fails = []
     for i in range(n):
         c = make(i, rng)
-        r = score_case(c, engine.run_engine(c["old"], c["new"], c["sops"]))
+        if kinds and c["meta"]["category"].split(" ")[0] not in kinds: continue
+        r = score_case(c, engine.run_engine(c["old"], c["new"], c["sops"], judge=judge_factory(c) if judge_factory else None))
         k = c["meta"]["category"].split(" ")[0] + (" (" + c["meta"]["category"].split("overlap=")[1] + " overlap)" if "overlap=" in c["meta"]["category"] else "")
         by[k][1] += 1; by[k][0] += r["passed"]
         if not r["passed"]: fails.append((c, r))
@@ -167,4 +180,6 @@ def run(n=1000, seed=7, show=8):
 
 
 if __name__ == "__main__":
-    run(int(sys.argv[1]) if len(sys.argv) > 1 else 1000, int(sys.argv[2]) if len(sys.argv) > 2 else 7)
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    run(int(args[0]) if args else 1000, int(args[1]) if len(args) > 1 else 7,
+        judge_factory=oracle_judge_for if "--oracle-judge" in sys.argv else None)

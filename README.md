@@ -77,6 +77,8 @@ python3 tests/test_agent.py        # end-to-end tests, including the MCP server
 **Folder convention:** `policies/<policy_family>/<file with a date or v1, v2 in the name>` (txt, md, pdf, docx) and `sops/<one file per SOP>`.
 Re-running only compares versions it has not seen, and the report accumulates.
 
+**Optional language-model check:** `--judge hf` (local open model) or `--judge api` (hosted model) adds a yes/no check for requirements the rules cannot connect to an SOP. It only sets flags, never writes text, and every answer is logged in the report and audit log. Tests: `python3 tests/test_judge.py`.
+
 **As an MCP connector** (use it from any MCP-capable assistant or tool):
 
 ```json

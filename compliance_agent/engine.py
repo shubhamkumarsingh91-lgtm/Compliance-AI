@@ -223,6 +223,17 @@ def is_long_passage(ch):
         len((ch.get("new") or ch.get("old") or "").split()) > MAX_RULE_WORDS
 
 
+class Reason(str):
+    """A reason string that also remembers how many shared words linked a change to an SOP (None for exact matches)."""
+    n_shared = None
+    kind = "rule"
+
+
+def _reason(text, n_shared=None, kind="rule"):
+    r = Reason(text); r.n_shared = n_shared; r.kind = kind
+    return r
+
+
 def affected_sops(changes, sops):
     """Maps each change to the SOPs it touches. Returns {sop_id: [(change, reason)]}."""
     out = {}
@@ -250,7 +261,7 @@ def affected_sops(changes, sops):
             for sid, shared in term_hits.items():
                 if len(shared) >= 0.6 * top:
                     out.setdefault(sid, []).append(
-                        (ch, f"shares terms {sorted(shared)} with a {ch['kind'].replace('_', ' ')}"))
+                        (ch, _reason(f"shares terms {sorted(shared)} with a {ch['kind'].replace('_', ' ')}", len(shared), "terms")))
     # A number in an SOP belongs to the changed sentence it shares the most words with.
     for sid, items in out.items():
         sop_text = next(x["text"] for x in sops if x["id"] == sid)
@@ -309,6 +320,10 @@ def draft_sop(sop, reasons):
         t2, ok = _remove_span(text, rem_stems & content_stems(text))
         if ok and t2 != text:
             text = t2; flags.append("VERIFY: a requirement was removed from this SOP because the policy dropped it")
+    for ch, why in reasons:
+        if getattr(why, "kind", "") == "judge" and ch["kind"] in ("removed", "removal_notice"):
+            flags.append("VERIFY: the model says a requirement this SOP may contain was removed from the policy; "
+                         "no matching words were found, so nothing was cut. Check this SOP by hand.")
     for ch, _ in reasons:
         if ch["kind"] == "quantity_change":
             toks = re.findall(r"[A-Za-z0-9]+", text)
@@ -329,13 +344,52 @@ def draft_sop(sop, reasons):
             sentence = ch["new"].rstrip(".") + "."
             if sentence.lower() not in text.lower():
                 text = text.rstrip() + " " + sentence
-                flags.append(f"NEW CLAUSE copied word for word from the policy, verify it belongs here: {sentence}")
+                how = "the model judged that it applies" if any(getattr(w, "kind", "") == "judge" for _, w in reasons) else "matched by shared words"
+                flags.append(f"NEW CLAUSE copied word for word from the policy ({how}), verify it belongs here: {sentence}")
     return text, flags
 
 
-def run_engine(old_doc, new_doc, sops):
+def _judge_pass(changes, mapped, sops, judge, jlog):
+    """The three narrow questions (see judge.py). Mutates `mapped` and `changes`; records every answer in jlog."""
+    if judge is None or getattr(judge, "name", "") == "none":
+        return
+    by_id = {x["id"]: x for x in sops}
+    # (3) same numbers, different words: same requirement? yes -> reworded, drop it from the review list
+    for c in list(changes):
+        if c["kind"] == "uncertain":
+            ans, why = judge.ask("same_requirement", c["old"], c["new"])
+            jlog.append(dict(question="same_requirement", old=c["old"], new=c["new"], answer=ans, reason=why))
+            if ans == "yes": changes.remove(c)
+            elif ans == "no": c["judge"] = "model says the requirement differs: " + why
+    # (2) links made by one shared word only: is the link real? no -> drop it
+    for sid in list(mapped):
+        keep = []
+        for ch, why in mapped[sid]:
+            if getattr(why, "kind", "") == "terms" and getattr(why, "n_shared", 9) == 1:
+                ans, r = judge.ask("applies", ch.get("new") or ch.get("old", ""), by_id[sid]["text"])
+                jlog.append(dict(question="weak_link", sop=sid, change=(ch.get("new") or ch.get("old", ""))[:160], answer=ans, reason=r))
+                if ans == "no": continue
+            keep.append((ch, why))
+        if keep: mapped[sid] = keep
+        else: del mapped[sid]
+    # (1) requirements that matched no SOP by words: does it apply to an SOP anyway?
+    for ch in changes:
+        if ch["kind"] not in ("added", "removal_notice", "removed") or is_long_passage(ch): continue
+        text = ch.get("new") or ch.get("old", "")
+        if re.match(r"\s*(for example|e\.g\.|for instance)", text, re.I): continue
+        for s_ in sops:
+            if any(c2 is ch for c2, _ in mapped.get(s_["id"], [])): continue
+            ans, r = judge.ask("applies", text, s_["text"])
+            jlog.append(dict(question="applies", sop=s_["id"], change=text[:160], answer=ans, reason=r))
+            if ans == "yes":
+                mapped.setdefault(s_["id"], []).append((ch, _reason(f"judge: {r}", None, "judge")))
+
+
+def run_engine(old_doc, new_doc, sops, judge=None):
     changes = diff_policy(old_doc["text"], new_doc["text"])
     mapped = affected_sops(changes, sops)
+    jlog = []
+    _judge_pass(changes, mapped, sops, judge, jlog)
     drafts = []
     for s in sops:
         if s["id"] in mapped:
@@ -354,4 +408,5 @@ def run_engine(old_doc, new_doc, sops):
     uncertain = [c for c in changes if c["kind"] == "uncertain"]
     return dict(changes_summary=summary, impact_analysis=mapped and {k: [w for _, w in v] for k, v in mapped.items()},
                 impact_parse_method="rules", affected_sop_ids=list(mapped), drafted_updates=drafts,
-                needs_review=[dict(old=c["old"], new=c["new"]) for c in uncertain])
+                needs_review=[dict(old=c["old"], new=c["new"], note=c.get("judge", "")) for c in uncertain],
+                judge_log=jlog)

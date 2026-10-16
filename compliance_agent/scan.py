@@ -15,9 +15,9 @@ def log_event(out_dir, event, **kw):
         f.write(json.dumps(dict(time=now(), event=event, **kw)) + "\n")
 
 
-def compare(old_doc, new_doc, sops):
-    """One old/new pair against a list of SOPs. Returns a plain dict (JSON friendly)."""
-    r = run_engine(old_doc, new_doc, sops)
+def compare(old_doc, new_doc, sops, judge=None):
+    """One old/new pair against a list of SOPs. Returns a plain dict (JSON friendly). `judge` is optional (see judge.py)."""
+    r = run_engine(old_doc, new_doc, sops, judge=judge)
     by_id = {s["id"]: s for s in sops}
     updates = []
     for d in r["drafted_updates"]:
@@ -27,7 +27,7 @@ def compare(old_doc, new_doc, sops):
         updates.append(dict(sop_id=d["sop_id"], sop_path=by_id[d["sop_id"]].get("path"), why=d["reasons"],
                             review_flags=d["review_flags"], draft_text=draft, diff=diff))
     return dict(changes=r["changes_summary"], affected_sops=r["affected_sop_ids"], updates=updates,
-                needs_review=r.get("needs_review", []))
+                needs_review=r.get("needs_review", []), judge_log=r.get("judge_log", []))
 
 
 def _md(pair):
@@ -38,13 +38,16 @@ def _md(pair):
         L += [f"### Suggested update: `{u['sop_id']}`", "", f"Why: {'; '.join(u['why'])}", ""]
         L += ["Review flags:"] + [f"- {f}" for f in u["review_flags"]] + [""]
         L += ["```diff", u["diff"].rstrip(), "```", ""]
+    if pair.get("judge_log"):
+        L += ["### What the language-model check decided", ""]
+        L += [f"- {j['question']} ({j.get('sop', '')}): **{j['answer']}** - {j['reason']}" for j in pair["judge_log"]] + [""]
     if pair["needs_review"]:
         L += ["### Needs a person to look at", ""]
         L += [f"- was: {x['old']}\n  now: {x['new']}" for x in pair["needs_review"]] + [""]
     return "\n".join(L)
 
 
-def scan_workspace(policies_dir, sops_dir, out_dir, force=False):
+def scan_workspace(policies_dir, sops_dir, out_dir, force=False, judge=None):
     out = pathlib.Path(out_dir); (out / "drafts").mkdir(parents=True, exist_ok=True)
     state_path = out / "state.json"
     state = json.loads(state_path.read_text()) if state_path.exists() else {}
@@ -57,13 +60,16 @@ def scan_workspace(policies_dir, sops_dir, out_dir, force=False):
             key = f"{fam}:{od['metadata']['sha']}:{nd['metadata']['sha']}:" + ",".join(sorted(s["id"] + store.sha(s["text"]) for s in sops))
             if state.get(key) and not force:
                 skipped += 1; continue
-            res = compare(od, nd, sops)
+            res = compare(od, nd, sops, judge=judge)
             res.update(family=fam, old_file=a.name, new_file=b.name)
             for u in res["updates"]:
                 (out / "drafts" / f"{u['sop_id']}.{b.stem}.draft.txt").write_text(u["draft_text"])
                 (out / "drafts" / f"{u['sop_id']}.{b.stem}.patch").write_text(u["diff"])
             state[key] = now(); pairs.append(res)
-            log_event(out, "compared", family=fam, old=a.name, new=b.name, affected=res["affected_sops"])
+            log_event(out, "compared", family=fam, old=a.name, new=b.name, affected=res["affected_sops"],
+                      judge=getattr(judge, "name", "none"), judge_calls=len(res["judge_log"]))
+            for j in res["judge_log"]:
+                log_event(out, "judge_answer", family=fam, new=b.name, **j)
     state_path.write_text(json.dumps(state, indent=1))
     rj = out / "report.json"                           # keep earlier results: the report is cumulative
     earlier = json.loads(rj.read_text()) if rj.exists() else []

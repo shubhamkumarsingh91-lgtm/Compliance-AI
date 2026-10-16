@@ -3,6 +3,9 @@
 Run:   python3 -m compliance_agent.mcp_server          (stdio)
 Add to an MCP client config as:  {"command": "python3", "args": ["-m", "compliance_agent.mcp_server"]}
 
+Language-model check: set COMPLIANCE_JUDGE=hf (local open model) or api (hosted model) before starting; default is none
+(rules only). The judge only answers yes/no/unsure; see judge.py.
+
 Safety design: every tool is read-only or writes only to the out folder, except apply_draft, which needs a named approver,
 keeps a backup, and writes an audit log line.
 """
@@ -13,6 +16,7 @@ except ImportError:                        # mcp 1.x
     from mcp.server.fastmcp import FastMCP as _Server
 from . import store, scan
 from .engine import run_engine
+from .judge import make_judge
 
 mcp = _Server("compliance-agent")
 
@@ -42,14 +46,14 @@ def suggest_sop_updates(old_path: str, new_path: str, sops_dir: str) -> dict:
     """For one old and one new policy file, find which SOPs are affected and suggest updated text with a diff and review
     flags. Writes nothing."""
     sops = store.load_sops(sops_dir)
-    return scan.compare(store.as_doc(old_path, "doc", 1), store.as_doc(new_path, "doc", 2), sops)
+    return scan.compare(store.as_doc(old_path, "doc", 1), store.as_doc(new_path, "doc", 2), sops, judge=make_judge())
 
 
 @mcp.tool()
 def scan_workspace(policies_dir: str, sops_dir: str, out_dir: str, force: bool = False) -> dict:
     """Scan every policy family, compare each new version with the previous one, and write report.md, report.json, drafts
     and patches into out_dir. Already-compared versions are skipped unless force is true. Never edits SOP files."""
-    return scan.scan_workspace(policies_dir, sops_dir, out_dir, force)
+    return scan.scan_workspace(policies_dir, sops_dir, out_dir, force, judge=make_judge())
 
 
 @mcp.tool()

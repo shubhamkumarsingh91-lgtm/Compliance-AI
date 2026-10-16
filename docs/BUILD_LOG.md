@@ -93,11 +93,21 @@ Result: 10/10 development, 8/8 blind, 97.6% to 98.3% on 4,000 generated cases. T
 | 6c4d06d | New package: folder scan, report, drafts, patches, audit log, approval-gated apply, 7 MCP tools, tests, demo workspace. Moved `engine.py` into the package | Turn the engine into something that scans documents and suggests changes | `compliance_agent/`, `tests/test_agent.py`, `demo_workspace/` |
 | 6c4d06d | Bugs found by running it on a real folder and fixed: removal left "mail a within 10 days"; report overwritten on rescan; misleading "not edited" flag; trailing newline lost | The case scores had not caught them (a substring test passed the broken text) | `engine.py` `diff_policy`, `_remove_span`, `draft_sop`; `scan.py` `scan_workspace`; exact-text tests |
 
+### F. Language-model check (judge)
+
+### 2026-10-16 Language-model check for the cases rules cannot decide
+What changed:   New `compliance_agent/judge.py`. The engine now takes an optional `judge` and asks it three narrow yes/no questions: (1) a new or removed requirement matched no SOP by words: does it apply to this SOP anyway; (2) an SOP was linked by only one shared word: is the link real; (3) same numbers but different words: is it the same requirement. Backends: none (default), fake (tests), `hf` (local open model, reuses the notebook's loaded Qwen), `api` (hosted model). CLI flag `--judge`, MCP env var `COMPLIANCE_JUDGE`.
+Why:            After rule fixes, the only failures left in 4,000 generated cases were added requirements worded with none of the SOP's words (0% for rules). Rules cannot judge meaning.
+Where:          `compliance_agent/judge.py` (all of it); `engine.py`: `_judge_pass`, `run_engine(..., judge=None)`, `Reason` class (remembers how many words linked a change to an SOP), `draft_sop` flags; `scan.py` (judge answers into audit log and report); `mcp_server.py`, `__main__.py` (switches).
+Safety rules:   The judge answers yes / no / unsure and a one-line reason. It never writes SOP text: added text is copied word for word from the policy and flagged "the model judged that it applies". "Unsure" never adds or removes anything. Unreadable output counts as "unsure". Answers are cached (same question, same answer) and every answer is logged.
+Tested by:      `python3 tests/test_judge.py` (7 tests with fake judges: strict parsing, rules miss the fire-drill case and the judge fixes it, an always-"no" judge cannot break correct rule matches, weak link dropped only on "no", reworded sentence suppressed only on "yes", no judge = identical results, call limit and cache, audit log). `generate_cases.py --oracle-judge` gives 1000/1000, which proves the plumbing only. Existing results unchanged: 10/10, 8/8, 98% on generated cases without a judge.
+Risk / limits:  NOT yet measured with a real model. The `hf` and `api` backends have not been run in this repo's environment. A real model can answer wrongly. Next: run `eval/kaggle_run_judge.py` on Kaggle and compare "rules only" with "rules + judge" per case type before trusting it.
+
 ## 5. What is coming next (and which files will change)
 
 | Step | What | Files that will change or be added | Why this order |
 |---|---|---|---|
-| 1 | Language-model check for the one failure type left (a new requirement worded with none of the SOP's words): ask a model one narrow yes/no question per uncertain pair, log its answer | `compliance_agent/judge.py` (new), `engine.py` (call it for uncertain pairs), tests with a fake model so tests need no GPU | Closes the last known failure type; any model size works |
+| 1 (built, awaiting real-model measurement) | Language-model check for the one failure type left (a new requirement worded with none of the SOP's words): ask a model one narrow yes/no question per uncertain pair, log its answer | `compliance_agent/judge.py` (new), `engine.py` (call it for uncertain pairs), tests with a fake model so tests need no GPU | Closes the last known failure type; any model size works |
 | 2 | Real document pairs at scale: you collect old and new public versions, I add a loader and a labeling sheet, then measure | `eval/real/`, a labeling template | Only real pairs prove real-world accuracy |
 | 3 | Web review screen: each diff with Approve / Reject, reviewer name, comments, audit trail | `compliance_agent/web.py` (new), `tests/` | A person-friendly front for the approval step |
 | 4 | More sources: Google Drive, SharePoint, a git repo, web pages with change detection | `compliance_agent/store.py` and new source files | Documents live in many places |
