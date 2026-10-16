@@ -4,6 +4,8 @@
 # First, in its own cell:  !git clone https://github.com/shubhamkumarsingh91-lgtm/compliance-ai /kaggle/working/repo
 # Runs every case twice: (A) whole-document comparison, (B) section-by-section comparison. Compare the two.
 import sys, json
+for _m in ("score", "sectioned"):      # forget copies cached from an earlier run in this session, so repo updates take effect
+    sys.modules.pop(_m, None)
 REPEATS = globals().get("REPEATS", 3)           # synthetic cases run this many times each (the model samples, so one run can be luck)
 RUN_LABEL = globals().get("RUN_LABEL", "run")   # set RUN_LABEL = "v2" in a cell above to keep results from different runs apart
 sys.path.insert(0, "/kaggle/working/repo/eval")
