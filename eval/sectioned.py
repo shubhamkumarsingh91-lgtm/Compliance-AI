@@ -108,13 +108,18 @@ def _grounded(finding, tokens):
     return hits
 
 
-def make_sectioned_detector(base_detect, focus=True, verbose=True, max_chars=3500):
+def make_sectioned_detector(base_detect, focus=True, verbose=True, max_chars=3500, short_words=1500):
     """Wraps detect_changes(old_doc, new_doc) so it runs per matched chunk and merges the results.
 
     The merged summary is filtered (must mention a really-changed number/obligation word), de-duplicated and
     capped at max_chars (about 900 tokens). Without the cap, 68 verbose findings produced an 18 GiB
     out-of-memory error in the impact step."""
     def detect(old_doc, new_doc, **kw):
+        # Short documents fit in one prompt, so compare them whole. Chunk matching only helps long documents, and on short
+        # ones it hid added/removed sentences (no matching chunk, or the grounding filter dropped the finding).
+        if len(old_doc["text"].split()) + len(new_doc["text"].split()) <= short_words:
+            if verbose: print("  sectioned: short document, comparing whole")
+            return base_detect(old_doc, new_doc)
         pairs = candidate_pairs(old_doc["text"], new_doc["text"], focus=focus)
         if verbose: print(f"  sectioned: {len(pairs)} candidate chunk pair(s) to check")
         scored, seen = [], set()
@@ -132,6 +137,8 @@ def make_sectioned_detector(base_detect, focus=True, verbose=True, max_chars=350
         for hits, out in scored:
             if size + len(out) > max_chars: continue
             merged.append(out); size += len(out)
-        if verbose: print(f"  sectioned: kept {len(merged)} of {len(pairs)} findings ({size} chars)")
+        if verbose:
+            print(f"  sectioned: kept {len(merged)} of {len(pairs)} findings ({size} chars)")
+            for m in merged: print("     kept:", m.replace("\n", " ")[:160])
         return "\n".join(merged) if merged else "No substantive changes."
     return detect
