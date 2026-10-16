@@ -39,6 +39,8 @@ Rule from now on: **every batch of changes gets an entry in section 4 below befo
 | `eval/cases/`, `eval/blind/` | 10 development cases (one real MITA pair) and 8 blind cases, each with an answer key | |
 | `eval/generate_cases.py` | Makes 1,000+ labeled test cases automatically | `make`, `run` |
 | `eval/run_engine_eval.py` | Runs the engine on all hand-written cases | |
+| `eval/generate_documents.py` | Builds whole synthetic manuals plus SOP libraries in the agent's folder layout and scores the real scan | `generate_workspace`, `run` |
+| `compliance_agent/judge.py` | The optional language-model check (yes/no/unsure questions only) | `Judge`, `HFJudge`, `ApiJudge` |
 | `eval/sectioned.py`, `eval/kaggle_run_eval.py` | The language-model route for Kaggle: section-by-section comparison and the run cell | `make_sectioned_detector` |
 | `notebooks/` , `patches/` | The original Kaggle notebooks (language-model pipeline) and the prompt fixes | |
 | `demo_workspace/` | Sample policies and SOPs to try the agent on | |
@@ -102,6 +104,15 @@ Where:          `compliance_agent/judge.py` (all of it); `engine.py`: `_judge_pa
 Safety rules:   The judge answers yes / no / unsure and a one-line reason. It never writes SOP text: added text is copied word for word from the policy and flagged "the model judged that it applies". "Unsure" never adds or removes anything. Unreadable output counts as "unsure". Answers are cached (same question, same answer) and every answer is logged.
 Tested by:      `python3 tests/test_judge.py` (7 tests with fake judges: strict parsing, rules miss the fire-drill case and the judge fixes it, an always-"no" judge cannot break correct rule matches, weak link dropped only on "no", reworded sentence suppressed only on "yes", no judge = identical results, call limit and cache, audit log). `generate_cases.py --oracle-judge` gives 1000/1000, which proves the plumbing only. Existing results unchanged: 10/10, 8/8, 98% on generated cases without a judge.
 Risk / limits:  NOT yet measured with a real model. The `hf` and `api` backends have not been run in this repo's environment. A real model can answer wrongly. Next: run `eval/kaggle_run_judge.py` on Kaggle and compare "rules only" with "rules + judge" per case type before trusting it.
+
+### G. Realistic manuals (long documents with sections, bullets and page headers)
+
+### 2026-10-16 Whole-manual generator, sentence-splitting fix, faster SOP matching
+What changed:   (1) New `eval/generate_documents.py`: builds 200 synthetic organisations per run, each with a policy manual (v1 and v2: section headings, bullets, running page headers, 25-40 sentences) and its own SOP library, written in the agent's real folder layout, then scored from the real `report.json` against an exact answer key. (2) Engine fix: sentence splitting. (3) Engine fix: SOP matching rewritten around a precomputed index. (4) Number-match rule: the SOP sharing the most words with a changed sentence wins; generic verbs ("keep", "send") no longer count as shared evidence.
+Why:            The tiny-case score (98%) hid a problem. On realistic manuals the agent scored 74%: headings and bullets were glued onto the next sentence, so a number from one place ended up compared with the words of another. Separately, matching one change against a library of 1,600 SOPs timed out because word sets were recomputed for every pair.
+Where:          `compliance_agent/engine.py`: `blocks`, `_is_heading`, `sentences` (headings label a section and are not requirements; bullets start a new block; hard-wrapped lines are joined), `SopIndex` and `_rare_terms` (computed once per run), `affected_sops` (value hits use the same best-match rule as word hits). `eval/generate_documents.py` (all).
+Tested by:      `python3 eval/generate_documents.py 200 <seed>`. Before the fix: 73.8%. After: 96.7%, 98.5% and 97.6% on seeds 3, 5 and 8 (about 670 checks each). Number, date, removal, silent removal and added-requirement changes: 100% in every seed checked. Earlier suites unchanged: 10/10, 8/8, 98.2% on 1,000 tiny cases, both test files pass.
+Risk / limits:  Remaining misses are all false alarms (about 1 in 10 manuals): an SOP linked to an added requirement by one shared word ("proof" in "submit proof of insurance" vs "keep proof of delivery"). That is exactly the "weak link" question the language-model check is for; it has not been run with a real model yet. These manuals are built from my templates, so the score shows robustness on this shape of document, not accuracy on real manuals. Heading detection is a heuristic and could mis-handle unusual layouts; real PDFs need more testing.
 
 ## 5. What is coming next (and which files will change)
 

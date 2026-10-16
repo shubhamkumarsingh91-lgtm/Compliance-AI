@@ -304,7 +304,11 @@ The real MITA pair produces 68 candidate chunk pairs, and the real 8 to 10 pair 
 
 **Next.** Language-model check for the one failure type rules cannot handle (requirements worded with none of the SOP's words), more sources (Drive, SharePoint, git, web pages with change monitoring), a review screen, and real document pairs at larger scale.
 
-### Phase 11 - Language-model check (judge)
+### Phase 11 - Realistic manuals and the language-model check
+
+**Realistic manuals.** `eval/generate_documents.py` builds whole synthetic manuals (sections, bullets, page headers) with their own SOP libraries and scores the real folder scan. It exposed that the tiny-case score (98%) overstated the agent: on manuals it first scored 74%. The fix was sentence splitting (headings and bullets no longer glued to the next sentence) plus a faster, indexed SOP matcher; it now scores 96.7% to 98.5% across seeds, with every real change found and edited correctly. The remaining misses are false alarms from one shared word, the case for the language-model check.
+
+**Language-model check (judge).**
 
 Rules decide what can be checked exactly; a judge handles meaning, in three narrow yes/no questions (requirement applies to an SOP with no shared words, weak one-word link real or not, reworded sentence same requirement or not). It never writes text, "unsure" changes nothing, and every answer is cached and logged. Backends: local open model (`hf`), hosted model (`api`), or none. Tested with fake judges for plumbing and safety; the real model's accuracy is measured by `eval/kaggle_run_judge.py` (rules only versus rules plus judge, per case type). Not yet measured.
 

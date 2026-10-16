@@ -138,6 +138,22 @@ SOPs flagged by one common word, two changes colliding on the same number), and 
 generator is my templates, so the later seeds are not independent proof. They show robustness on this family of changes.
 Accuracy on real policy writing needs real old/new document pairs with human-checked answers.
 
+## Whole-manual test (`generate_documents.py`)
+
+`python3 generate_documents.py 200 3` builds 200 organisations (seed 3), each with a policy manual in two versions (sections,
+bullets, running page headers) and its own SOP library, runs the agent's real folder scan on each, and scores `report.json`
+against an exact answer key (number, month, removed, silently removed, added requirement, no false alarms).
+
+| Seed | Checks | Passed |
+|---|---|---|
+| 3 | 671 | 96.7% |
+| 5 | 671 | 98.5% |
+| 8 | 709 | 97.6% |
+
+All real changes are found and edited correctly in every seed checked. The misses are false alarms, mostly an SOP linked to a
+new requirement by a single shared word. That is what the optional language-model check is for. Before the sentence-splitting fix
+this score was 73.8%.
+
 ## Results log (real runs on Qwen2.5-7B-Instruct 4-bit, Kaggle T4 x2)
 
 Numbers here come from actual runs, not estimates.

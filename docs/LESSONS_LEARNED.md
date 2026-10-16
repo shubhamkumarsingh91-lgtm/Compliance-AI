@@ -74,6 +74,11 @@ This is a running log of what went wrong while building and testing this tool, w
 43. **Test the safety rules, not just the happy path.** The tests prove an always-"no" or always-"unsure" judge cannot remove a correct rule-based match, that unreadable output becomes "unsure", and that a call limit and cache hold.
 44. **A perfect score with a fake oracle only proves the wiring.** 1000/1000 with an oracle judge says nothing about a real model. The real number comes from `eval/kaggle_run_judge.py`.
 
+45. **Realistic input is a different test.** The same engine scored 98% on tiny cases and 74% on whole manuals. The cause was not the matching rules but sentence splitting: headings and bullets were glued onto the next sentence. Always test on the shape of the real thing.
+46. **Matching must scale.** Recomputing word sets for every change and SOP pair timed out at 1,600 SOPs. Precompute an index once per run.
+47. **Test in the shape you will deploy.** Putting 200 organisations' SOPs in one folder made identical SOPs from other organisations look like false alarms. Each organisation now has its own workspace, like a real customer.
+48. **Headings are not requirements.** Treating "Section 3. Timelines" as sentence text polluted numbers and words. Headings now label a section and are dropped.
+
 ## Open problems (as of the latest run)
 
 | Problem | Evidence | Next step |

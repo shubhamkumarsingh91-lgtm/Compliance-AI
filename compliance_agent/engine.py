@@ -78,10 +78,39 @@ def clean_lines(text):
     return [l for l, m in zip(lines, masked) if cnt[m] < 3 and not re.fullmatch(r"[\d\W]+", l)]
 
 
+BULLET = re.compile(r"^\s*(?:[-*\u2022\uf076\u25cf]|\(?\d{1,2}[.)]|\(?[a-z][.)])\s+")
+HEADING = re.compile(r"^(?:Section|Chapter|Article|Part|Appendix)\s+[\w.-]+(?:[.:]\s|\s|$)", re.I)
+
+
+def _is_heading(line, next_line):
+    """A short title-like line with no end punctuation, followed by a line that starts a new sentence."""
+    if HEADING.match(line) and len(line.split()) <= 12: return True
+    w = line.split()
+    if not (1 <= len(w) <= 8) or line.rstrip()[-1:] in ".!?:;,": return False
+    if not all(x[:1].isupper() or x.lower() in ("and", "of", "the", "for", "to", "in", "on", "a") for x in w): return False
+    return next_line is None or next_line[:1].isupper() or bool(BULLET.match(next_line))
+
+
+def blocks(lines):
+    """Groups lines into blocks. A heading or a bullet always starts a new block; hard-wrapped lines are joined."""
+    out, cur = [], []
+    for i, l in enumerate(lines):
+        nxt = lines[i + 1] if i + 1 < len(lines) else None
+        if BULLET.match(l) and cur: out.append(" ".join(cur)); cur = []
+        if _is_heading(l, nxt):
+            if cur: out.append(" ".join(cur)); cur = []
+            continue                                           # headings label a section; they are not requirements
+        cur.append(BULLET.sub("", l, count=1))
+        if l.rstrip()[-1:] in ".!?" and (nxt is None or nxt[:1].isupper() or BULLET.match(nxt)):
+            out.append(" ".join(cur)); cur = []
+    if cur: out.append(" ".join(cur))
+    return out
+
+
 def sentences(text):
-    lines = clean_lines(text)
-    body = " ".join(lines)
-    parts = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9])", body)
+    parts = []
+    for blk in blocks(clean_lines(text)):
+        parts += re.split(r"(?<=[.!?])\s+(?=[A-Z0-9])", blk)
     return [p.strip() for p in parts if len(p.split()) >= 3]
 
 
@@ -188,15 +217,25 @@ GENERIC_VERBS = {_stem(w) for w in """record log keep send submit check complete
 notify mail give get make use need follow include prepare""".split()}
 
 
-def _rare_terms(stems, sops):
-    """Terms that appear in fewer than half of the SOPs (so shared common words do not cause false flags)."""
-    sop_stems = [content_stems(s["text"]) for s in sops]
-    n = len(sops)
+class SopIndex:
+    """Word sets and document frequencies for the SOP library, computed once per run (a library can hold thousands)."""
+    def __init__(self, sops):
+        self.n = len(sops)
+        self.body = {s["id"]: content_stems(s["text"]) for s in sops}
+        self.titled = {s["id"]: content_stems(s["text"] + " " + s.get("title", "")) for s in sops}
+        self.toks = {s["id"]: set(t.lower() for t in _tokens(s["text"])) for s in sops}
+        self.df = {}
+        for st in self.body.values():
+            for t in st: self.df[t] = self.df.get(t, 0) + 1
+
+
+def _rare_terms(stems, idx):
+    """Terms that appear in at most half of the SOPs (so shared common words do not cause false flags)."""
     keep = set()
     for t in stems:
         if t in GENERIC_VERBS: continue
-        df = sum(1 for ss in sop_stems if t in ss)
-        if df and (n == 1 or df <= n / 2):
+        df = idx.df.get(t, 0)
+        if df and (idx.n == 1 or df <= idx.n / 2):
             keep.add(t)
     return keep
 
@@ -237,25 +276,32 @@ def _reason(text, n_shared=None, kind="rule"):
 def affected_sops(changes, sops):
     """Maps each change to the SOPs it touches. Returns {sop_id: [(change, reason)]}."""
     out = {}
+    idx = SopIndex(sops)
     for ch in changes:
         if is_long_passage(ch): continue
         if re.match(r"\s*(for example|e\.g\.|for instance)", (ch.get("new") or ch.get("old") or ""), re.I): continue
-        term_hits = {}                                   # SOPs matched only by shared words, with how many
+        rare = _rare_terms(ch["stems"], idx) if ch["kind"] not in ("quantity_change", "value_change") else None
+        term_hits, value_hits = {}, {}                   # SOPs matched by shared words / by an old value plus shared words
         for s in sops:
-            toks = set(t.lower() for t in _tokens(s["text"]))
+            toks = idx.toks[s["id"]]
             if ch["kind"] == "quantity_change":
                 near = _near_number(s["text"], ch["old_values"], ch["key"])
                 if near:
                     out.setdefault(s["id"], []).append((ch, f"states {near} next to '{' '.join(ch['key'])}'"))
             elif ch["kind"] == "value_change":
                 has_val = any(v in toks for v in ch["old_values"])
-                shared_ctx = ch["ctx"] & content_stems(s["text"] + " " + s.get("title", ""))
+                shared_ctx = (ch["ctx"] - GENERIC_VERBS) & idx.titled[s["id"]] if has_val else set()
                 if has_val and shared_ctx:
-                    out.setdefault(s["id"], []).append(
-                        (ch, f"states old value {ch['old_values']} and shares terms {sorted(shared_ctx)}"))
+                    value_hits[s["id"]] = shared_ctx
             else:
-                shared = _rare_terms(ch["stems"], sops) & content_stems(s["text"])
+                shared = rare & idx.body[s["id"]]
                 if shared: term_hits[s["id"]] = shared
+        if value_hits:                                    # same rule for numbers: the SOP that shares the most words wins
+            top = max(len(v) for v in value_hits.values())
+            for sid, shared_ctx in value_hits.items():
+                if len(shared_ctx) >= 0.6 * top:
+                    out.setdefault(sid, []).append(
+                        (ch, f"states old value {ch['old_values']} and shares terms {sorted(shared_ctx)}"))
         if term_hits:                                     # keep the best matches only (at least 60% of the top overlap)
             top = max(len(v) for v in term_hits.values())
             for sid, shared in term_hits.items():
@@ -264,11 +310,10 @@ def affected_sops(changes, sops):
                         (ch, _reason(f"shares terms {sorted(shared)} with a {ch['kind'].replace('_', ' ')}", len(shared), "terms")))
     # A number in an SOP belongs to the changed sentence it shares the most words with.
     for sid, items in out.items():
-        sop_text = next(x["text"] for x in sops if x["id"] == sid)
         best = {}
         for ch, why in items:
             if ch["kind"] != "value_change": continue
-            sc = len(ch["ctx"] & content_stems(sop_text))
+            sc = len(ch["ctx"] & idx.body[sid])
             for v in ch["old_values"]:
                 if sc > best.get(v, (-1, None))[0]: best[v] = (sc, ch)
         out[sid] = [(ch, why) for ch, why in items
