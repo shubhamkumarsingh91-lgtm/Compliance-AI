@@ -53,7 +53,7 @@ Full design document, phase by phase: [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCU
 compliance_agent/  The agent: rule engine, folder scan, MCP server, CLI
 tests/       End-to-end agent tests (scan safety, exact drafts, approval, MCP over stdio)
 demo_workspace/  Sample policies and SOPs to try the agent on
-eval/        Test harness: 6 synthetic + 1 real (MITA 2.0 to 3.0) old/new policy cases with answer keys, scorer, real-document fetcher
+eval/        Test harness: 10 development cases (9 synthetic + 1 real, MITA 2.0 to 3.0) and 8 blind cases with answer keys, scorer, real-document fetcher
 notebooks/   Kaggle notebooks, in run order (starter, phase 3 diff, phase 4 drafting)
 patches/     Paste-in cells: structured impact fix, stricter draft prompt + flagger
 demo/        compliance_demo.html (redline view), compliance_dashboard.html - open in a browser
@@ -108,9 +108,9 @@ Tools: `compare_policy_text`, `compare_policy_files`, `list_policy_versions`, `s
 
 - [x] Ingest, retrieve, change detection, impact mapping, draft generation
 - [x] Fix wrong-SOP flagging; add human-review flags for invented clauses
-- [x] Test harness built: 6 synthetic cases (certification, MITA-style, policy, control) with answer keys - see `eval/`
-- [ ] Run the harness on the real model and publish the numbers
-- [ ] Grow to 20+ cases and add real old/new public document pairs
+- [x] Test harness built: 18 cases (9 synthetic, 1 real public pair, 8 blind) with answer keys - see `eval/`
+- [x] Run the harness on the real model and publish the numbers (language model 6/10; rule engine 10/10 and 8/8 blind)
+- [ ] Grow past 20 cases and add more real old/new public document pairs (1 so far)
 - [ ] Run on real public versioned CMS documents
 - [ ] Customer interviews (agency, vendor, other-state practitioners) - decide build, pivot or stop
 - [ ] Hosted backend so results persist

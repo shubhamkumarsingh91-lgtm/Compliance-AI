@@ -22,7 +22,10 @@ change recall, which SOPs were flagged (precision and recall), whether each edit
 the new value and no longer contains the old one, and whether any unaffected SOP got a draft.
 It also counts sentences the model added that were not in the original (human-review flags).
 
-## The synthetic cases (plus one real case, below)
+## Test cases
+
+18 cases in total: 10 development cases in `cases/` (9 synthetic plus 1 real public pair, below) and 8 blind
+cases in `blind/`, written after the rule engine was built. The development cases:
 
 | Case | Category | What it tests |
 |---|---|---|
@@ -32,6 +35,10 @@ It also counts sentences the model added that were not in the original (human-re
 | `policy_02_new_requirement_added` | policy | A new obligation with no changed number - the hardest kind |
 | `policy_03_requirement_removed` | policy | An obligation removed; the SOP must drop it |
 | `control_01_wording_only` | control | Wording changes only; the correct answer is to flag nothing |
+| `cert_02_mixed_changes` | certification | Holdout: a changed date and an added item in the same document |
+| `policy_04_new_requirement_b` | policy | Holdout: a new obligation, worded differently from policy_02 |
+| `policy_05_requirement_removed_b` | policy | Holdout: a removed requirement, worded differently from policy_03 |
+| `real_mita_intro_2_0_to_3_0` | MITA (real) | Real public CMS documents, 2.0 to 3.0; see below |
 
 All text is invented. The cases are modeled on the kinds of changes that appear in real
 CMS updates, but they are not real policy text.
@@ -43,7 +50,7 @@ CMS updates, but they are not real policy text.
    It runs every case twice (whole-document vs section-by-section comparison), prints pass/fail tables
    and saves `eval_results_whole.json` and `eval_results_sectioned.json`. The real MITA case makes about
    70 model calls in section mode, so allow roughly 10-15 minutes.
-3. Put the numbers in the main README. No numbers yet - none have been run on the real model.
+3. Results from real model runs are in the Results log at the end of this file and summarized in the main README.
 
 `mock_pipelines.py` holds fake pipelines used only to prove the scorer works (an "oracle" that
 reads the answer key and scores 100%, a "do nothing" that should pass only the control, and a
@@ -61,7 +68,7 @@ and a true old/new pair of the same document still needs to be chosen and verifi
 
 ## Limits
 
-- Six synthetic cases is a smoke test, not a benchmark. Expect to grow it to 20 or more.
+- 18 cases (only one from real documents) is a smoke test, not a benchmark. Expect to grow it, especially with real document pairs.
 - Matching is keyword-based, so a correct change described in different words can count as missed.
   Read the failures before trusting the percentages.
 - Synthetic documents are cleaner than real ones. Real-document scores will likely be lower.
@@ -246,5 +253,5 @@ we can see whether the model or the filter caused the miss.
 See `docs/LESSONS_LEARNED.md` for the full list of problems and fixes.
 
 ### Next
-1. Rerun with `REPEATS = 3` for stable pass rates on the synthetic cases (do not change prompts before this).
+1. ~~Rerun with `REPEATS = 3` for stable pass rates on the synthetic cases~~ Done in Run 3: 6/10, stable.
 2. Rerun the real MITA case in section mode with the capped summary.
