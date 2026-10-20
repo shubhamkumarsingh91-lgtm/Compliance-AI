@@ -2,12 +2,14 @@
 
 > **Disclaimer:** Independent personal project for self-learning. Not affiliated with any employer, state agency or vendor. Uses only public documents and synthetic data. No internal or confidential data and no personal data (no SSNs, member or patient records, PHI/PII). Views are my own. See DISCLAIMER.md.
 
-A RAG prototype that detects Medicaid policy changes between document versions, finds the
-internal procedures (SOPs) those changes affect, and drafts updated procedure text with
-citations to the source policy.
+A compliance agent that compares versions of Medicaid policy documents, finds the internal
+procedures (SOPs) each change affects, and suggests updated procedure text as reviewable diffs.
+Nothing is changed without a named reviewer's approval, and every action is logged.
 
-Built on a free Kaggle GPU using only public CMS-style policy text and synthetic internal
-procedures.
+It started as a language-model (RAG) pipeline on a free Kaggle GPU. Testing showed the model
+was unreliable at exact work, so checkable decisions now come from a rule-based engine, and a
+language model is used only for narrow yes/no questions about meaning. Only public CMS
+documents and synthetic SOPs are used.
 
 ## The problem
 
@@ -17,35 +19,72 @@ show up later as audit findings.
 
 ## How it works
 
-![Swim-lane diagram of the pipeline and what is done vs next](docs/swimlane.png)
+```mermaid
+flowchart LR
+    A[Policy versions<br/>txt, md, pdf, docx] --> B[Compare old vs new<br/>rule engine]
+    B --> C[Map each change<br/>to affected SOPs]
+    C --> D[Suggested edits as diffs<br/>with VERIFY flags]
+    C -. uncertain .-> J[Optional language-model<br/>yes/no check]
+    J -.-> D
+    D --> R{Named reviewer<br/>approves?}
+    R -- yes --> E[SOP updated<br/>backup kept]
+    R -- no --> F[Nothing changes]
+    D --> L[(Audit log)]
+    E --> L
+```
 
-Green solid boxes are built and tested. Amber dashed boxes are next steps.
+1. **Compare** - align sentences between versions; ignore rewording; catch changed numbers and
+   dates, added and removed requirements, and removal notices
+2. **Map** - flag an SOP for a changed value only if it states the old value and shares words
+   with the changed sentence; for an added or removed requirement, only if it shares a rare word
+3. **Draft** - swap the value, cut the dropped clause, or copy the new policy sentence word for
+   word. Text is never invented, and every edit carries a VERIFY flag
+4. **Check meaning (optional)** - a language model answers narrow yes/no questions the rules
+   cannot, such as whether a requirement applies to an SOP that shares none of its words.
+   It only sets flags and never writes text
+5. **Approve** - a named person approves each change; a backup is kept and the approval logged
 
-1. **Ingest** - split policy text into chunks and embed them (all-MiniLM-L6-v2, FAISS)
-2. **Detect changes** - compare old and new versions of the same policy with an LLM
-3. **Map impact** - for each SOP, structured JSON says affected or not, with a reason
-4. **Draft** - rewrite only the affected numbers in each affected SOP, with citation
-5. **Flag** - any sentence in a draft that does not closely match the original SOP is
-   marked for human review
+## Example output
 
-## Results on the sample data
+From `demo_workspace/`: the policy raised the prior-authorization threshold from 15 to 20 visits.
 
-Change tested: prior-authorization threshold raised from 15 to 20 visits.
+```diff
+--- front_desk_visit_check (current)
++++ front_desk_visit_check (suggested)
+-Front desk staff verify the visit count against the 15-visit prior authorization threshold before scheduling.
++Front desk staff verify the visit count against the 20-visit prior authorization threshold before scheduling.
+ Escalate unclear cases to the billing lead.
+```
 
-- 2 of 3 SOPs flagged as affected (PT intake, claims appeals)
-- The telehealth SOP was correctly left alone (an earlier string-matching bug flagged it;
-  fixed with structured JSON output and a negation-aware fallback parser)
-- The model still sometimes adds sentences the policy never asked for. These are caught by
-  the new-clause flagger and shown to the reviewer, not silently accepted.
+Flag shown to the reviewer: `VERIFY: value changed ['15'] -> ['20']`
+
+## Results
+
+| Version | Test | Result |
+|---|---|---|
+| Language model (Qwen2.5-7B) | 10 development cases, 3 repeated runs | 6 of 10: found every change, but false alarms, removed requirements kept, answers varied run to run |
+| Rule engine | 10 development cases (9 synthetic, 1 real: MITA 2.0 to 3.0) | 10 of 10, identical every run |
+| Rule engine | 8 blind cases, written after the engine | 8 of 8 |
+| Rule engine | 4,000 generated cases, four seeds | 97.6% to 98.3% |
+| Full agent | 200 generated policy manuals, real folder scan | 96.7% to 98.5% of checks |
+
+Answer keys are written before any run. Details and the full run log: [eval/README.md](eval/README.md).
 
 ## Honest status
 
-Full design document, phase by phase: [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md). A full log of what went wrong and what I changed is in [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md).
-
-- Evaluated on 9 synthetic cases and 1 real public pair (MITA 2.0 to 3.0). Language-model version, latest repeated run: 6 of 10 passed (recall 1.0, but false alarms and removed requirements kept). New rule-based engine (`eval/engine.py`, no GPU, same answer every run): 10 of 10 development and 8 of 8 blind cases, with honest caveats on how much that proves. Details in eval/README.md.
-- Not tested on real versioned CMS or state documents.
-- Market need is **unvalidated**: a first practitioner conversation suggested the current
+- **How far to trust the numbers:** the rules were tuned on the development cases, the blind
+  set is partly used after one fix, and the generated tests use my own templates. Fresh,
+  independent cases are needed for an unbiased number.
+- **Known limit:** rules cannot judge meaning. A requirement added in words the SOP never uses
+  is missed; that is what the language-model check is for, and its accuracy is not yet measured.
+- **Real documents:** one real public pair (MITA 2.0 to 3.0) passes. No second real pair and no
+  real SOPs yet.
+- **Market need is unvalidated:** a first practitioner conversation suggested the current
   manual process may already be good enough. Customer interviews come before more building.
+
+Design document, phase by phase: [docs/DESIGN_DOCUMENT.md](docs/DESIGN_DOCUMENT.md). What went
+wrong and what I changed: [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md). One-page overview:
+[docs/Compliance_AI_Overview.pdf](docs/Compliance_AI_Overview.pdf).
 
 ## Repo layout
 
@@ -90,6 +129,8 @@ Tools: `compare_policy_text`, `compare_policy_files`, `list_policy_versions`, `s
 
 ## Run the original notebooks
 
+The original language-model pipeline, kept for the record ([diagram](docs/swimlane.png)).
+
 1. On Kaggle: Create > New Notebook > File > Import Notebook
 2. Settings: Accelerator GPU T4 x2, Internet on (phone verification required)
 3. Run the notebooks in order, then the two cells in `patches/`
@@ -97,12 +138,13 @@ Tools: `compare_policy_text`, `compare_policy_files`, `list_policy_versions`, `s
 
 ## Stack
 
-| Part | Choice |
-|---|---|
-| Generation | Qwen2.5-7B-Instruct, 4-bit |
-| Embeddings | sentence-transformers all-MiniLM-L6-v2 |
-| Search | FAISS |
-| Compute | Kaggle T4 x2 |
+| Part | Current agent | Original pipeline |
+|---|---|---|
+| Change detection, mapping, drafting | Rule-based engine (Python, no GPU) | Qwen2.5-7B-Instruct, 4-bit |
+| Meaning check | Optional language model, local (`hf`) or hosted (`api`) | - |
+| Retrieval | - | sentence-transformers all-MiniLM-L6-v2, FAISS |
+| Interface | Command line and MCP server | Kaggle notebooks |
+| Compute | Any machine | Kaggle T4 x2 |
 
 ## Roadmap
 
@@ -111,7 +153,11 @@ Tools: `compare_policy_text`, `compare_policy_files`, `list_policy_versions`, `s
 - [x] Test harness built: 18 cases (9 synthetic, 1 real public pair, 8 blind) with answer keys - see `eval/`
 - [x] Run the harness on the real model and publish the numbers (language model 6/10; rule engine 10/10 and 8/8 blind)
 - [ ] Grow past 20 cases and add more real old/new public document pairs (1 so far)
-- [ ] Run on real public versioned CMS documents
+- [x] Rule-based engine, compliance agent, approval-gated edits, audit log, MCP server
+- [x] Generated scale tests: 4,000 cases and 200 whole manuals
+- [x] Optional language-model check (built and safety-tested)
+- [ ] Measure the language-model check's accuracy
+- [ ] Fresh blind cases; run on more real public versioned CMS documents
 - [ ] Customer interviews (agency, vendor, other-state practitioners) - decide build, pivot or stop
 - [ ] Hosted backend so results persist
 
