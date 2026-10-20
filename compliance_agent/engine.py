@@ -333,26 +333,83 @@ def _replace_values(text, old_vals, new_vals):
     return text, True
 
 
+DETERMINERS = {"a", "an", "the", "each", "any", "all", "every"}
+PREPOSITIONS = {"to", "with", "for", "from", "by", "at", "on", "in", "into", "of"}
+CONJUNCTIONS = {"and", "also", "then", "or"}
+BROKEN = re.compile(r"\b(a|an|the|each|any|every)\s+(and|or|to|of|with|for|from|by|at|on|in|into)\b|"
+                    r"\b(a|an|the|each|any|every)[.,;:!?]|^\s*(to|of|with|for|from|by|at|on|in|into|and|or)\b", re.I)
+
+
+def _bare(w):
+    return re.sub(r"\W", "", w.lower())
+
+
 def _remove_span(text, stems):
-    words = text.split(" ")
-    hit = [(i, _stem(re.sub(r"\W", "", w.lower()))) for i, w in enumerate(words)]
-    idx = [i for i, st in hit if st in stems]
-    if not idx: return text, False, []
+    """Cuts the phrase a dropped requirement occupies: the matched words, plus the article before them and, when the
+    phrase is an action ("mail a paper copy ..."), its verb and any trailing "to the agency" part. Returns
+    (new_text, status, cut_words) with status "cut", "none" (no match) or "unclean" (the cut would leave broken text,
+    so nothing is changed and a person must edit it)."""
+    tok = re.split(r"(\s+)", text)
+    seps = [""] + tok[1::2]                            # whitespace before each word
+    words = tok[0::2]
+    if words and words[-1] == "":                       # text ending in whitespace
+        words, seps = words[:-1], seps[:-1]
+    starts = lambda i: i == 0 or bool(re.search(r"[.!?]$", words[i - 1]))
+    hit = [_stem(_bare(w)) for w in words]
+    idx = [i for i, st in enumerate(hit) if st in stems]
+    if not idx: return text, "none", []
     runs, cur = [], [idx[0]]
     for i in idx[1:]:                                  # words within 3 positions belong to the same phrase
-        if i - cur[-1] <= 3: cur.append(i)
+        if i - cur[-1] <= 3 and not starts(i): cur.append(i)
         else: runs.append(cur); cur = [i]
     runs.append(cur)
-    best = max(runs, key=lambda r: len({dict(hit)[i] for i in r}))
+    best = max(runs, key=lambda r: len({hit[i] for i in r}))
     a, b = best[0], best[-1]
-    while a > 0 and re.sub(r"\W", "", words[a - 1].lower()) in ("and", "also", "then", "or"):
+    while a > 0 and not starts(a) and _bare(words[a - 1]) in DETERMINERS:
         a -= 1
-    rest = words[:a] + words[b + 1:]
-    if rest and re.sub(r"\W", "", rest[0].lower()) in ("and", "or", "then"):
-        rest = rest[1:]
-    trailing = text[len(text.rstrip()):]
-    out = " ".join(rest).replace(" ,", ",").strip()
-    return ((out[:1].upper() + out[1:]) if out else out) + trailing, True, words[a: b + 1]
+    # the verb that governs the removed object: first word of its sentence, or the word after "and"
+    if a > 0 and not starts(a) and not re.search(r"[,;:]$", words[a - 1]) and \
+            _bare(words[a - 1]) not in DETERMINERS | PREPOSITIONS | CONJUNCTIONS and \
+            (starts(a - 1) or (a > 1 and (_bare(words[a - 2]) in CONJUNCTIONS or words[a - 2].endswith(",")))):
+        a -= 1
+    while a > 0 and not starts(a) and _bare(words[a - 1]) in CONJUNCTIONS:
+        a -= 1
+    # a whole action cut from the start of a sentence takes its "to the agency" part with it, up to the next "and"
+    if starts(a) and not re.search(r"[.!?]$", words[b]) and b + 1 < len(words) and _bare(words[b + 1]) in PREPOSITIONS:
+        j = b + 1
+        while j + 1 < len(words) and _bare(words[j + 1]) not in CONJUNCTIONS and not re.search(r"[.!?,;]$", words[j]):
+            j += 1
+        if _bare(words[j + 1] if j + 1 < len(words) else "") in CONJUNCTIONS or re.search(r"[.!?]$", words[j]):
+            b = j
+    end_punct = re.search(r"[.!?]$", words[b])
+    keep = list(range(0, a)) + list(range(b + 1, len(words)))
+    if starts(a):                                      # "and dispense ..." -> "dispense ..."
+        while True:
+            nxt = [i for i in keep if i > b]
+            if nxt and _bare(words[nxt[0]]) in CONJUNCTIONS and not re.search(r"[.!?]$", words[nxt[0]]):
+                keep.remove(nxt[0])
+            else:
+                break
+    out_words = {i: words[i] for i in keep}
+    nxt = [i for i in keep if i > b]
+    if starts(a) and nxt and (not end_punct or starts(nxt[0])):
+        w = out_words[nxt[0]]; out_words[nxt[0]] = w[:1].upper() + w[1:]
+    prev = [i for i in keep if i < a]
+    if end_punct and prev and not re.search(r"[.!?]$", words[prev[-1]]):
+        out_words[prev[-1]] = words[prev[-1]].rstrip(",;:") + end_punct.group(0)
+    out = ""
+    for n, i in enumerate(keep):
+        if n == 0: sep = ""
+        elif i > b and keep[n - 1] < a: sep = seps[a]   # the gap where the cut was keeps the whitespace before it
+        else: sep = seps[i]
+        out += sep + out_words[i]
+    if not out.strip():
+        return text, "unclean", []                      # the whole SOP was the removed requirement: a person decides
+    out += text[len(text.rstrip()):]
+    edited = [x for x in _sop_sentences(out) if x not in set(_sop_sentences(text))]
+    if any(BROKEN.search(x) or len(x.split()) < 2 for x in edited):
+        return text, "unclean", []
+    return out, "cut", words[a: b + 1]
 
 
 def _sop_sentences(text):
@@ -366,8 +423,11 @@ def draft_sop(sop, reasons):
         if ch["kind"] in ("removed", "removal_notice"):
             rem_stems |= ch["stems"]
     if len(rem_stems & content_stems(text)) >= 2 and len(rem_stems) <= 8:
-        t2, ok, cut = _remove_span(text, rem_stems & content_stems(text))
-        if ok and t2 != text:
+        t2, status, cut = _remove_span(text, rem_stems & content_stems(text))
+        if status == "unclean":
+            flags.append("VERIFY: the policy dropped a requirement this SOP contains, but it could not be cut cleanly; "
+                         "edit this SOP by hand")
+        if status == "cut" and t2 != text:
             untouched = set(_sop_sentences(text))         # lines as they were before the cut
             text = t2; flags.append("VERIFY: a requirement was removed from this SOP because the policy dropped it")
             # Other lines may only make sense because of the removed requirement ("keep the mailing receipt" after

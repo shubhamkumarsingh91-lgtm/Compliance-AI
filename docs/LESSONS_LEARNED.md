@@ -79,7 +79,13 @@ This is a running log of what went wrong while building and testing this tool, w
 47. **Test in the shape you will deploy.** Putting 200 organisations' SOPs in one folder made identical SOPs from other organisations look like false alarms. Each organisation now has its own workspace, like a real customer.
 48. **Headings are not requirements.** Treating "Section 3. Timelines" as sentence text polluted numbers and words. Headings now label a section and are dropped.
 
-## Open problems (as of the latest run)
+49. **A removed requirement can leave orphans behind.** When the policy dropped "mail a paper copy", the agent cut it, but the SOP still said "keep the mailing receipt". Rules cannot know for sure that a line depends on what was cut, so lines that share its words are now flagged for the reviewer to delete, never cut automatically.
+50. **Passing tests can hide unreadable output.** About 15% of removal drafts on the generated manuals read badly ("Obtain a and dispense the refill", "Mail a to the agency"), yet every score passed, because scores checked that the removed words were gone, not that the sentence still read. The notice names the thing removed but not the action, so the verb and article were left behind. Fix: cut the whole phrase (verb, article and a trailing "to the agency" part); if the result still reads broken, change nothing and flag the SOP for a person. Broken drafts went from 144 of 976 to 0, with every score unchanged. A test now checks exact text for these cases.
+
+## Open problems in the language-model pipeline
+
+The rule engine (section G) fixed the first, second and fourth rows below. They are kept because they are the evidence for moving to rules. Current open problems are in docs/DESIGN_DOCUMENT.md, section 9.
+
 
 | Problem | Evidence | Next step |
 |---|---|---|

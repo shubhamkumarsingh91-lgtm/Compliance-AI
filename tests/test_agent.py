@@ -52,6 +52,25 @@ def test_apply_requires_approval():
     assert any(e["event"] == "applied" and e["approved_by"] == "Test Approver" for e in log)
 
 
+def test_removal_reads_cleanly():
+    """A removed requirement is cut with its verb and article, never leaving text like 'Obtain a and dispense'.
+    If a clean cut is not possible, nothing is changed and a person is asked to edit."""
+    from compliance_agent.engine import _remove_span, content_stems
+    cases = [
+        ("Obtain a physician signature on each refill request and dispense the refill.",
+         "physician signature each refill request", "Dispense the refill.", "cut"),
+        ("Mail a paper copy of each referral requests to the agency and upload the electronic file.",
+         "paper copy each referral requests", "Upload the electronic file.", "cut"),
+        ("Log the claim.\nMail a paper copy to the agency and upload the file.\nClose the ticket.",
+         "paper copy", "Log the claim.\nUpload the file.\nClose the ticket.", "cut"),
+        ("Submit the form electronically and mail a paper copy.", "paper copy", "Submit the form electronically.", "cut"),
+        ("Mail a paper copy.", "paper copy", "Mail a paper copy.", "unclean"),
+    ]
+    for sop, removed, want, status in cases:
+        got, st, _ = _remove_span(sop, content_stems(removed))
+        assert (got, st) == (want, status), (sop, got, st)
+
+
 def payload(res):
     sc = getattr(res, "structured_content", None) or getattr(res, "structuredContent", None)
     return json.dumps(sc) if sc else res.content[0].text
