@@ -11,7 +11,11 @@ This is the single document covering the project from Phase 0 (setup) to the lat
 
 ## 0. Summary
 
-The pipeline works end to end and finds changes reliably (recall 1.0 on test cases). It over-flags unaffected SOPs and does not reliably delete requirements the policy removed. Latest repeated whole-document run: 6 of 10 test cases passed. A real-document test (MITA 2.0 to 3.0) exposed a hardware limit and a detection gap, both described below. Whether anyone needs this product is **not yet validated**.
+The project has two versions. The original language-model pipeline found every change (recall 1.0) but raised false alarms, kept requirements the policy had removed, and gave different answers on identical input: 6 of 10 test cases passed. Those are problems of asking a model to do exact work, so the checkable work moved to a **rule-based engine** (Phase 9). It passes 10 of 10 development cases and 8 of 8 blind cases, the same way every run, including the real MITA 2.0 to 3.0 pair, and 96.7% to 98.5% of checks on 200 generated policy manuals.
+
+The engine now runs inside a **compliance agent** (Phase 10): it scans folders of policies and SOPs, writes suggested changes as diffs, never edits a file without a named approver, logs every action, and is usable from any MCP-capable assistant. A narrow language-model check handles the one thing rules cannot (meaning without shared words); it is built but its accuracy is not yet measured (Phase 11).
+
+How far to trust this: the rules were tuned on the development cases, the generated tests use my own templates, and only one real document pair has been tested. Whether anyone needs this product is **not yet validated**.
 
 ## 1. Project overview
 
@@ -43,12 +47,12 @@ Show, with measured evidence, whether an AI pipeline built only from public docu
 | # | Objective | How it is measured | Status |
 |---|---|---|---|
 | O1 | Build a working end-to-end pipeline (ingest, retrieve, detect, map, draft, flag) on free hardware | Pipeline runs start to finish on a Kaggle T4 | Done |
-| O2 | Find the real changes between two versions | Change recall (proposed target 0.9 or higher) | Whole-document runs: 1.0. Real long document: not yet |
-| O3 | Flag only the SOPs that are truly affected | Impact precision and recall (proposed target 0.9 or higher each); zero false alarms on a wording-only change | Recall 1.0, precision 0.889; the wording-only control still fails |
-| O4 | Edit SOPs correctly: change what must change, keep everything else, delete what the policy removed, invent nothing | Required and forbidden text per SOP; new-clause flags | Numbers: works. Removed requirements: fails |
+| O2 | Find the real changes between two versions | Change recall (proposed target 0.9 or higher) | Language model: 1.0 on short cases, missed the real long document. Rule engine: 1.0 on all cases, including the real MITA pair |
+| O3 | Flag only the SOPs that are truly affected | Impact precision and recall (proposed target 0.9 or higher each); zero false alarms on a wording-only change | Language model: recall 1.0, precision 0.889, wording-only control fails. Rule engine: 1.0 and 1.0, control passes |
+| O4 | Edit SOPs correctly: change what must change, keep everything else, delete what the policy removed, invent nothing | Required and forbidden text per SOP; new-clause flags | Language model: numbers work, removed requirements fail. Rule engine: both pass; added requirements are copied word for word, never invented |
 | O5 | Keep a human in control | Every draft carries review flags; nothing is "approved" automatically | Done |
 | O6 | Measure honestly and publish the failures | Answer keys written before runs, holdout cases, repeated runs, lessons log | Done, ongoing |
-| O7 | Decide whether this is worth building further | Conversations with real practitioners | Not started; the biggest open risk |
+| O7 | Decide whether this is worth building further | Conversations with real practitioners | One conversation so far; the biggest open risk |
 
 The targets are my own proposed bars for "good enough to be useful as a draft tool". They are not an industry standard.
 
@@ -120,6 +124,8 @@ old version + new version (public policy text)
         |
   [6 Report]       JSON output, redline demo page, dashboard
 ```
+
+This is the original language-model pipeline (Phases 2 to 8). The current version replaces steps 2 to 5 with the rule-based engine and adds a narrow language-model check for meaning; see Phases 9 to 11.
 
 Models: Qwen2.5-7B-Instruct (4-bit, bitsandbytes) for generation; sentence-transformers all-MiniLM-L6-v2 for embeddings; FAISS for search.
 
@@ -326,6 +332,10 @@ Rules decide what can be checked exactly; a judge handles meaning, in three narr
 
 ## 8. Results
 
+**Current version: rule-based engine (no GPU, same answer every run).** 10 of 10 development cases and 8 of 8 blind cases pass. 4,000 generated cases across four seeds: 97.6% to 98.3%. 200 generated whole manuals run through the real folder scan: 96.7% to 98.5% of checks. Trust limits are in Phase 9 and section 9.
+
+The runs below are the original language-model pipeline. They are kept because they are the evidence for the move to rules.
+
 **Run 1 (original prompts, whole-document, 7 cases):** 4 passed, 3 failed. Failures: requirements added or removed were not handled because the prompts forbade it, and SOPs that only mentioned the change indirectly were missed. Led to the v2 prompts (affected if the change alters something the SOP states, or adds or removes a requirement for the activity the SOP performs; draft may delete a removed requirement or add one short sentence).
 
 **Run 2 (v2 prompts, 10 cases, one run each):** about 4 to 5 of 10, different cases failing in different runs. The disagreement on identical input showed single runs are noisy, which led to repeated runs.
@@ -336,6 +346,15 @@ Rules decide what can be checked exactly; a judge handles meaning, in three narr
 
 ## 9. Known weaknesses (open problems)
 
+**Current version (rule engine and agent):**
+
+1. **Rules cannot judge meaning.** A requirement added in words the SOP never uses is missed. This is the only failure type in the generated tests, and the reason for the language-model check, whose accuracy is not yet measured.
+2. **Tuned on its own tests.** The rules were developed against the 10 development cases, and the blind set is partly used up after one fix. Fresh blind cases are needed for an unbiased number.
+3. **Generated tests use my own templates.** They show robustness on this family of changes, not accuracy on real policy writing.
+4. **One real document pair, no real SOPs.**
+
+**Original language-model pipeline (fixed by the rule engine, kept for the record):**
+
 1. **Removed requirements stay in drafts.** Failed in all 3 whole-document runs on a holdout.
 2. **False alarms.** The wording-only control fails 0/3 in whole-document mode; the maturity SOP was flagged wrongly in both real-case runs. In compliance work, noise erodes trust.
 3. **Real MITA 8 to 10 change missed in section mode.** Cause not yet identified.
@@ -345,6 +364,12 @@ Rules decide what can be checked exactly; a judge handles meaning, in three narr
 
 ## 10. Planned fixes (next)
 
+**Current:**
+- Measure the language-model check: rules only versus rules plus judge, per case type (`eval/kaggle_run_judge.py`).
+- Write fresh blind cases and add a second real document pair with a hand-written answer key.
+- Talk to practitioners before building more (objective O7).
+
+**Earlier plan for the language-model pipeline (superseded by the rule engine):**
 - **Removal handling:** ask the model only to name the sentence to delete; delete it in code; if the named text is not found verbatim in the SOP, route to human review. Deterministic and testable.
 - **False alarms:** flag an SOP only when the changed terms from the detected change actually appear in it.
 - **Real case:** read the printed `kept:` findings and the saved JSON to find whether the model or the filter lost the 8 to 10 change, then fix that piece only.
@@ -358,10 +383,14 @@ Rules decide what can be checked exactly; a judge handles meaning, in three narr
 - [x] Evaluation harness with answer keys, holdouts, repeats, one real case
 - [x] Section mode for long documents, size routing for short ones
 - [x] Rule-based engine fixes removal and false-alarm problems on all current cases (10/10 development, 8/8 blind)
-- [ ] Hybrid: add a narrow language-model yes/no check for uncertain pairs
+- [x] Compliance agent: folder scan, approval-gated edits, audit log, MCP server
+- [x] Generated scale tests: 4,000 cases and 200 whole manuals
+- [x] Hybrid: narrow language-model yes/no check for uncertain pairs (built and tested for safety)
+- [ ] Measure the language-model check's accuracy
 - [ ] Fresh blind cases and a second real document pair
 - [ ] Real MITA case passing in section mode
-- [ ] 20+ cases; more real old/new public document pairs
+- [x] 18 hand-written cases (9 synthetic, 1 real pair, 8 blind)
+- [ ] More real old/new public document pairs
 - [ ] Customer conversations (agency staff, vendors, practitioners in other states)
 - [ ] Optional: thin reporting prototype (status per SOP, synthetic quarterly summary)
 - [ ] Optional: hosted backend so results persist
@@ -371,7 +400,7 @@ Rules decide what can be checked exactly; a judge handles meaning, in three narr
 | Risk | Note |
 |---|---|
 | **Market need unvalidated** | A first practitioner conversation suggested the manual process may already be good enough. Customer interviews come before more building. |
-| **Accuracy** | Current numbers do not support any claim of reliability. Draft-only, human-in-the-loop is the only responsible framing. |
+| **Accuracy** | The rule engine passes every current test, but those tests are small, partly tuned on, and mostly synthetic. That does not support a claim of real-world reliability. Draft-only, human-in-the-loop is the only responsible framing. |
 | **Scope and ownership** | This is a personal project built on public documents and synthetic SOPs. Check any employment agreement on side projects and IP before commercializing anything. |
 | **Public repo** | The repo was made public for sharing. Set it back to private if you do not want it indexed; the link then stops working for others. |
 
