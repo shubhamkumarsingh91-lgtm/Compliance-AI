@@ -337,7 +337,7 @@ def _remove_span(text, stems):
     words = text.split(" ")
     hit = [(i, _stem(re.sub(r"\W", "", w.lower()))) for i, w in enumerate(words)]
     idx = [i for i, st in hit if st in stems]
-    if not idx: return text, False
+    if not idx: return text, False, []
     runs, cur = [], [idx[0]]
     for i in idx[1:]:                                  # words within 3 positions belong to the same phrase
         if i - cur[-1] <= 3: cur.append(i)
@@ -352,7 +352,11 @@ def _remove_span(text, stems):
         rest = rest[1:]
     trailing = text[len(text.rstrip()):]
     out = " ".join(rest).replace(" ,", ",").strip()
-    return ((out[:1].upper() + out[1:]) if out else out) + trailing, True
+    return ((out[:1].upper() + out[1:]) if out else out) + trailing, True, words[a: b + 1]
+
+
+def _sop_sentences(text):
+    return [x.strip() for line in text.splitlines() for x in re.split(r"(?<=[.!?])\s+", line) if x.strip()]
 
 
 def draft_sop(sop, reasons):
@@ -362,9 +366,18 @@ def draft_sop(sop, reasons):
         if ch["kind"] in ("removed", "removal_notice"):
             rem_stems |= ch["stems"]
     if len(rem_stems & content_stems(text)) >= 2 and len(rem_stems) <= 8:
-        t2, ok = _remove_span(text, rem_stems & content_stems(text))
+        t2, ok, cut = _remove_span(text, rem_stems & content_stems(text))
         if ok and t2 != text:
+            untouched = set(_sop_sentences(text))         # lines as they were before the cut
             text = t2; flags.append("VERIFY: a requirement was removed from this SOP because the policy dropped it")
+            # Other lines may only make sense because of the removed requirement ("keep the mailing receipt" after
+            # "mail a paper copy" is dropped). Rules cannot tell for sure, so they are flagged for a person, never cut.
+            dep = content_stems(" ".join(cut))
+            for sent in [x for x in _sop_sentences(text) if x in untouched]:
+                shared = dep & content_stems(sent)
+                if shared:
+                    flags.append(f"VERIFY: this line may depend on the removed requirement (shares {sorted(shared)}); "
+                                 f"delete it if it is no longer needed: {sent}")
     for ch, why in reasons:
         if getattr(why, "kind", "") == "judge" and ch["kind"] in ("removed", "removal_notice"):
             flags.append("VERIFY: the model says a requirement this SOP may contain was removed from the policy; "

@@ -25,7 +25,11 @@ def test_scan_and_safety():
     assert fd.startswith("Front desk staff verify the visit count against the 20-visit prior authorization threshold"), fd
     pa = [v for k, v in d.items() if k.startswith("pa_request_submission") and k.endswith("draft.txt")][0]
     assert pa.startswith("Submit prior authorization requests within 3 business days of the 20th visit."), pa
-    flagged = {u["sop_id"] for p in json.loads((out / "report.json").read_text()) for u in p["updates"]}
+    report = json.loads((out / "report.json").read_text())
+    claim_flags = [f for p in report for u in p["updates"] if u["sop_id"] == "claim_packet" for f in u["review_flags"]]
+    assert any("may depend on the removed requirement" in f and "mailing receipt" in f for f in claim_flags), \
+        "a line that only made sense with the removed requirement must be flagged (but not cut)"
+    flagged = {u["sop_id"] for p in report for u in p["updates"]}
     assert "patient_statements" not in flagged and "timely_filing_check" not in flagged, flagged
     r2 = scan.scan_workspace(ws / "policies", ws / "sops", out)
     assert r2["compared"] == 0 and r2["already_done"] == 4, r2
